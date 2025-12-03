@@ -6,15 +6,33 @@ export type CalendarEvent = {
   endDate: Date
 }
 
-export function generateGoogleCalendarUrl(event: CalendarEvent): string {
-  const formatDate = (date: Date) => {
-    return date.toISOString().replace(/-|:|\.\d{3}/g, '')
-  }
+// Format date as local time for Google Calendar (YYYYMMDDTHHmmss)
+function formatDateForGoogle(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}${month}${day}T${hours}${minutes}${seconds}`
+}
 
+// Format date for ICS file (local time without Z suffix)
+function formatDateForIcs(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${year}${month}${day}T${hours}${minutes}${seconds}`
+}
+
+export function generateGoogleCalendarUrl(event: CalendarEvent): string {
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: event.title,
-    dates: `${formatDate(event.startDate)}/${formatDate(event.endDate)}`,
+    dates: `${formatDateForGoogle(event.startDate)}/${formatDateForGoogle(event.endDate)}`,
     details: event.description || '',
     location: event.location || '',
   })
@@ -23,20 +41,22 @@ export function generateGoogleCalendarUrl(event: CalendarEvent): string {
 }
 
 export function generateIcsFile(event: CalendarEvent): string {
-  const formatDate = (date: Date) => {
-    return date.toISOString().replace(/-|:|\.\d{3}/g, '').slice(0, -1) + 'Z'
-  }
-
+  const uid = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}@iamin.app`
+  
   const icsContent = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//iamin//Event//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `DTSTART:${formatDate(event.startDate)}`,
-    `DTEND:${formatDate(event.endDate)}`,
-    `SUMMARY:${event.title}`,
-    `DESCRIPTION:${event.description || ''}`,
-    `LOCATION:${event.location || ''}`,
+    `UID:${uid}`,
+    `DTSTAMP:${formatDateForIcs(new Date())}`,
+    `DTSTART:${formatDateForIcs(event.startDate)}`,
+    `DTEND:${formatDateForIcs(event.endDate)}`,
+    `SUMMARY:${event.title.replace(/[,;\\]/g, '\\$&')}`,
+    `DESCRIPTION:${(event.description || '').replace(/[,;\\]/g, '\\$&').replace(/\n/g, '\\n')}`,
+    `LOCATION:${(event.location || '').replace(/[,;\\]/g, '\\$&')}`,
     'END:VEVENT',
     'END:VCALENDAR',
   ].join('\r\n')

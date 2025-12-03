@@ -16,12 +16,14 @@ interface LocationSuggestion {
 interface LocationInputProps {
   name: string
   defaultValue?: string
+  value?: string
+  onChange?: (value: string) => void
   placeholder?: string
   className?: string
 }
 
-export function LocationInput({ name, defaultValue = '', placeholder = 'Search for a location...', className }: LocationInputProps) {
-  const [query, setQuery] = useState(defaultValue)
+export function LocationInput({ name, defaultValue = '', value, onChange, placeholder = 'Search for a location...', className }: LocationInputProps) {
+  const [query, setQuery] = useState(value ?? defaultValue)
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -69,23 +71,32 @@ export function LocationInput({ name, defaultValue = '', placeholder = 'Search f
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setQuery(value)
+    const newValue = e.target.value
+    setQuery(newValue)
+    onChange?.(newValue)
     
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)
     }
     
     debounceRef.current = setTimeout(() => {
-      searchLocation(value)
+      searchLocation(newValue)
     }, 300)
   }
 
   const handleSelectSuggestion = (suggestion: LocationSuggestion) => {
     setQuery(suggestion.display_name)
+    onChange?.(suggestion.display_name)
     setSuggestions([])
     setShowSuggestions(false)
   }
+
+  // Sync with controlled value
+  useEffect(() => {
+    if (value !== undefined && value !== query) {
+      setQuery(value)
+    }
+  }, [value])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!showSuggestions || suggestions.length === 0) return
@@ -124,7 +135,7 @@ export function LocationInput({ name, defaultValue = '', placeholder = 'Search f
           onKeyDown={handleKeyDown}
           onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
           placeholder={placeholder}
-          className={cn("pl-10 pr-10", className)}
+          className={cn("pl-10 pr-10 rounded-xl", className)}
           autoComplete="off"
         />
         {isLoading && (
@@ -133,7 +144,7 @@ export function LocationInput({ name, defaultValue = '', placeholder = 'Search f
       </div>
       
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-lg overflow-hidden">
+        <div className="absolute z-50 w-full mt-1 bg-zinc-900 border border-zinc-700 rounded-xl shadow-lg overflow-hidden">
           {suggestions.map((suggestion, index) => (
             <button
               key={suggestion.place_id}

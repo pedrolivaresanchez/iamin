@@ -54,8 +54,8 @@ type Attendee = {
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
-  const day = date.getUTCDate()
-  const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })
+  const day = date.getDate()
+  const month = date.toLocaleString('en-US', { month: 'short' })
   return `${month} ${day}`
 }
 

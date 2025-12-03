@@ -1,11 +1,20 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import CopyLinkButton from './copy-link-button'
 import ManageButton from './manage-button'
 import CreateEventButton from './create-event-button'
+import DeleteEventButton from './delete-event-button'
+
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  })
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -53,66 +62,79 @@ export default async function DashboardPage() {
             const isPast = new Date(event.date) < new Date()
             
             return (
-              <Card 
+              <div 
                 key={event.id} 
-                className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800/50 transition-colors group flex flex-col overflow-hidden"
+                className="bg-zinc-900 border border-zinc-800 rounded-xl hover:bg-zinc-800/50 transition-colors group overflow-hidden"
               >
-                <CardHeader className="pb-3 px-5 pt-5">
-                  <div className="flex justify-between items-start gap-3">
-                    <CardTitle className="text-zinc-100 text-lg leading-tight">
+                {/* Event Image */}
+                {event.image_url ? (
+                  <div className="relative h-32 w-full">
+                    <Image 
+                      src={event.image_url} 
+                      alt={event.title}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
+                  </div>
+                ) : (
+                  <div className="h-20 w-full bg-gradient-to-br from-zinc-800 to-zinc-900" />
+                )}
+
+                {/* Content */}
+                <div className="p-4 space-y-3">
+                  {/* Title & Actions */}
+                  <div className="flex justify-between items-start gap-2">
+                    <h3 className="text-zinc-100 font-semibold leading-tight line-clamp-1">
                       {event.title}
-                    </CardTitle>
-                    <Badge 
-                      variant="secondary" 
-                      className={`shrink-0 text-sm ${
-                        attendeeCount > 0 
-                          ? 'bg-emerald-950 text-emerald-400 border-emerald-900' 
-                          : 'bg-zinc-800 text-zinc-500'
-                      }`}
-                    >
+                    </h3>
+                    <DeleteEventButton eventId={event.id} eventTitle={event.title} />
+                  </div>
+
+                  {/* Badges */}
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge variant="secondary" className={`text-xs ${isPast ? 'bg-zinc-800 text-zinc-500' : 'bg-violet-500/10 text-violet-400 border-violet-500/20'}`}>
+                      {formatDate(event.date)}
+                    </Badge>
+                    <Badge variant="secondary" className={`text-xs ${attendeeCount > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-zinc-800 text-zinc-500'}`}>
                       {attendeeCount} {attendeeCount === 1 ? 'guest' : 'guests'}
                     </Badge>
-                  </div>
-                  {event.description && (
-                    <CardDescription className="text-zinc-500 line-clamp-2 mt-2 text-sm">
-                      {event.description}
-                    </CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent className="pb-4 px-5">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2 text-sm text-zinc-300">
-                      <span>📅</span>
-                      <span className={isPast ? 'text-zinc-500' : ''}>{new Date(event.date).toLocaleDateString()}</span>
-                      {isPast && <span className="text-zinc-600">(Past)</span>}
-                    </div>
-                    {event.location && (
-                      <div className="flex items-start gap-2 text-sm text-zinc-400">
-                        <span className="shrink-0">📍</span>
-                        <span className="line-clamp-1">{event.location}</span>
-                      </div>
+                    {isPast && (
+                      <Badge variant="secondary" className="text-xs bg-zinc-800 text-zinc-600">
+                        Past
+                      </Badge>
+                    )}
+                    {event.password && (
+                      <Badge variant="secondary" className="text-xs bg-zinc-800 text-zinc-500">
+                        Private
+                      </Badge>
                     )}
                   </div>
-                </CardContent>
-                <CardFooter className="pt-3 px-5 pb-5 border-t border-zinc-800 mt-auto gap-2">
-                  <ManageButton eventId={event.id} />
-                  <CopyLinkButton slug={event.slug} />
-                </CardFooter>
-              </Card>
+
+                  {/* Location */}
+                  {event.location && (
+                    <p className="text-xs text-zinc-500 line-clamp-1">{event.location}</p>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-2 border-t border-zinc-800">
+                    <ManageButton eventId={event.id} />
+                    <CopyLinkButton slug={event.slug} />
+                  </div>
+                </div>
+              </div>
             )
           })}
         </div>
       ) : (
-        <Card className="border-zinc-800 bg-zinc-900">
-          <CardContent className="text-center py-12 sm:py-16">
-            <div className="text-4xl sm:text-5xl mb-4">🎉</div>
-            <p className="text-zinc-400 mb-2">No events yet</p>
-            <p className="text-zinc-500 text-sm mb-6">Create your first event to get started</p>
-            <Button asChild>
-              <Link href="/events/new">Create your first event →</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl text-center py-12 sm:py-16">
+          <div className="text-4xl sm:text-5xl mb-4">🎉</div>
+          <p className="text-zinc-400 mb-2">No events yet</p>
+          <p className="text-zinc-500 text-sm mb-6">Create your first event to get started</p>
+          <Button asChild>
+            <Link href="/events/new">Create your first event →</Link>
+          </Button>
+        </div>
       )}
 
       {/* Mobile FAB */}

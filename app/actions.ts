@@ -9,10 +9,10 @@ import { nanoid } from 'nanoid'
 // Schemas
 const createEventSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
   date: z.string().min(1, 'Date is required'),
-  location: z.string().optional(),
-  host_name: z.string().optional(),
+  location: z.string().nullable().optional(),
+  host_name: z.string().nullable().optional(),
   price: z.coerce.number().min(0).optional(),
   currency: z.string().default('USD'),
   payment_methods: z.object({
@@ -22,10 +22,17 @@ const createEventSchema = z.object({
     bizum: z.string().optional(),
     cashapp: z.string().optional(),
     other: z.string().optional(),
-  }).optional(),
-  image_url: z.string().optional(),
-  spotify_url: z.string().optional(),
-  max_spots: z.coerce.number().min(0).optional(),
+    bank_account: z.object({
+      bank_name: z.string().optional(),
+      account_holder: z.string().optional(),
+      iban: z.string().optional(),
+      bic: z.string().optional(),
+    }).optional(),
+  }).nullable().optional(),
+  image_url: z.string().nullable().optional(),
+  spotify_url: z.string().nullable().optional(),
+  max_spots: z.coerce.number().min(0).nullable().optional(),
+  password: z.string().nullable().optional(),
 })
 
 const registerAttendeeSchema = z.object({
@@ -83,7 +90,20 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
   const maxSpotsValue = formData.get('max_spots')
   
   // Collect payment methods
-  const paymentMethods = {
+  const bankAccount = {
+    bank_name: formData.get('payment_bank_name') as string || undefined,
+    account_holder: formData.get('payment_bank_holder') as string || undefined,
+    iban: formData.get('payment_bank_iban') as string || undefined,
+    bic: formData.get('payment_bank_bic') as string || undefined,
+  }
+  // Clean empty bank values
+  Object.keys(bankAccount).forEach(key => {
+    if (!bankAccount[key as keyof typeof bankAccount]?.trim()) {
+      delete bankAccount[key as keyof typeof bankAccount]
+    }
+  })
+  
+  const paymentMethods: Record<string, unknown> = {
     revolut: formData.get('payment_revolut') as string || undefined,
     paypal: formData.get('payment_paypal') as string || undefined,
     venmo: formData.get('payment_venmo') as string || undefined,
@@ -93,18 +113,30 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
   }
   // Clean empty values
   Object.keys(paymentMethods).forEach(key => {
-    if (!paymentMethods[key as keyof typeof paymentMethods]?.trim()) {
-      delete paymentMethods[key as keyof typeof paymentMethods]
+    const val = paymentMethods[key]
+    if (typeof val === 'string' && !val.trim()) {
+      delete paymentMethods[key]
     }
   })
+  // Add bank account if has IBAN
+  if (bankAccount.iban?.trim()) {
+    paymentMethods.bank_account = bankAccount
+  }
   
   const hostName = formData.get('host_name') as string
   
+  const passwordValue = formData.get('password') as string
+  
+  const titleValue = formData.get('title') as string
+  const descriptionValue = formData.get('description') as string
+  const dateValue = formData.get('date') as string
+  const locationValue = formData.get('location') as string
+
   const rawData = {
-    title: formData.get('title'),
-    description: formData.get('description'),
-    date: formData.get('date'),
-    location: formData.get('location'),
+    title: titleValue || '',
+    description: descriptionValue || '',
+    date: dateValue || '',
+    location: locationValue || '',
     host_name: hostName || null,
     price: priceValue ? Number(priceValue) : 0,
     currency: currency || 'USD',
@@ -112,6 +144,7 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
     image_url: imageUrl,
     spotify_url: spotifyUrl || null,
     max_spots: maxSpotsValue ? Number(maxSpotsValue) : null,
+    password: passwordValue?.trim() || null,
   }
 
   const parsed = createEventSchema.safeParse(rawData)
@@ -232,6 +265,36 @@ export async function deleteAttendee(attendeeId: string, eventId?: string): Prom
   return { success: true }
 }
 
+// Delete Event
+export async function deleteEvent(eventId: string): Promise<ActionState> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { error: 'Unauthorized' }
+  }
+
+  // Delete attendees first
+  await supabase
+    .from('attendees')
+    .delete()
+    .eq('event_id', eventId)
+
+  // Delete the event
+  const { error } = await supabase
+    .from('events')
+    .delete()
+    .eq('id', eventId)
+    .eq('created_by', user.id)
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/dashboard')
+  return { success: true }
+}
+
 // Update Attendee
 export async function updateAttendee(attendeeId: string, data: { full_name: string; phone: string }, eventId?: string): Promise<ActionState> {
   const supabase = await createClient()
@@ -302,7 +365,20 @@ export async function updateEvent(prevState: ActionState, formData: FormData): P
   const maxSpotsValue = formData.get('max_spots')
   
   // Collect payment methods
-  const paymentMethods = {
+  const bankAccountUpdate = {
+    bank_name: formData.get('payment_bank_name') as string || undefined,
+    account_holder: formData.get('payment_bank_holder') as string || undefined,
+    iban: formData.get('payment_bank_iban') as string || undefined,
+    bic: formData.get('payment_bank_bic') as string || undefined,
+  }
+  // Clean empty bank values
+  Object.keys(bankAccountUpdate).forEach(key => {
+    if (!bankAccountUpdate[key as keyof typeof bankAccountUpdate]?.trim()) {
+      delete bankAccountUpdate[key as keyof typeof bankAccountUpdate]
+    }
+  })
+  
+  const paymentMethodsUpdate: Record<string, unknown> = {
     revolut: formData.get('payment_revolut') as string || undefined,
     paypal: formData.get('payment_paypal') as string || undefined,
     venmo: formData.get('payment_venmo') as string || undefined,
@@ -311,26 +387,37 @@ export async function updateEvent(prevState: ActionState, formData: FormData): P
     other: formData.get('payment_other') as string || undefined,
   }
   // Clean empty values
-  Object.keys(paymentMethods).forEach(key => {
-    if (!paymentMethods[key as keyof typeof paymentMethods]?.trim()) {
-      delete paymentMethods[key as keyof typeof paymentMethods]
+  Object.keys(paymentMethodsUpdate).forEach(key => {
+    const val = paymentMethodsUpdate[key]
+    if (typeof val === 'string' && !val.trim()) {
+      delete paymentMethodsUpdate[key]
     }
   })
+  // Add bank account if has IBAN
+  if (bankAccountUpdate.iban?.trim()) {
+    paymentMethodsUpdate.bank_account = bankAccountUpdate
+  }
   
   const hostName = formData.get('host_name') as string
+  const passwordValueUpdate = formData.get('password') as string
+  const titleValueUpdate = formData.get('title') as string
+  const descriptionValueUpdate = formData.get('description') as string
+  const dateValueUpdate = formData.get('date') as string
+  const locationValueUpdate = formData.get('location') as string
   
   const rawData = {
-    title: formData.get('title'),
-    description: formData.get('description'),
-    date: formData.get('date'),
-    location: formData.get('location'),
+    title: titleValueUpdate || '',
+    description: descriptionValueUpdate || '',
+    date: dateValueUpdate || '',
+    location: locationValueUpdate || '',
     host_name: hostName || null,
     price: priceValue ? Number(priceValue) : 0,
     currency: currency || 'USD',
-    payment_methods: Object.keys(paymentMethods).length > 0 ? paymentMethods : null,
+    payment_methods: Object.keys(paymentMethodsUpdate).length > 0 ? paymentMethodsUpdate : null,
     image_url: imageUrl,
     spotify_url: spotifyUrl || null,
     max_spots: maxSpotsValue ? Number(maxSpotsValue) : null,
+    password: passwordValueUpdate?.trim() || null,
   }
 
   const parsed = createEventSchema.safeParse(rawData)

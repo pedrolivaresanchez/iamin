@@ -16,7 +16,6 @@ function formatEventDate(dateString: string): string {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
-    timeZone: 'UTC'
   })
 }
 
@@ -25,7 +24,6 @@ function formatEventTime(dateString: string): string {
   return date.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
-    timeZone: 'UTC'
   })
 }
 

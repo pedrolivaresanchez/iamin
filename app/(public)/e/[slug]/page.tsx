@@ -9,6 +9,7 @@ import AnimatedBackground from './animated-background'
 import { Button } from '@/components/ui/button'
 import { getCurrencySymbol, getCurrencyFlag } from '@/lib/currencies'
 import PaymentPopup from './payment-popup'
+import SpotifyEmbed from './spotify-embed'
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
@@ -16,7 +17,6 @@ function formatDate(dateString: string): string {
     weekday: 'long',
     month: 'short',
     day: 'numeric',
-    timeZone: 'UTC'
   })
 }
 
@@ -26,7 +26,6 @@ function formatTime(dateString: string): string {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'UTC'
   }).toLowerCase()
 }
 
@@ -82,21 +81,23 @@ export default async function EventPage({
                 </div>
               )}
               <div className="flex-1 min-w-0 text-left">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-100 tracking-tight">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-100 tracking-tight">
                 {event.title}
               </h1>
               {event.host_name && (
-                <p className="text-zinc-500 text-sm mt-1.5 flex items-center gap-1.5">
-                  <span>👑</span> Hosted by <span className="text-zinc-300">{event.host_name}</span>
+                <p className="text-zinc-500 text-sm mt-2">
+                  Hosted by <span className="text-zinc-300">{event.host_name}</span>
                 </p>
-              )}
-              {event.description && (
-                  <div className="text-zinc-400 mt-2 sm:mt-3 text-sm leading-relaxed prose prose-sm prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:text-zinc-200 prose-strong:text-zinc-200 prose-a:text-emerald-400 max-w-none">
-                    <ReactMarkdown>{event.description}</ReactMarkdown>
-                  </div>
               )}
               </div>
             </div>
+
+            {/* Description */}
+            {event.description && (
+              <div className="text-zinc-400 text-sm leading-relaxed prose prose-sm prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:text-zinc-200 prose-strong:text-zinc-200 prose-a:text-emerald-400 max-w-none">
+                <ReactMarkdown>{event.description}</ReactMarkdown>
+              </div>
+            )}
 
             {/* Date & Time */}
             <div className="flex items-start gap-3">
@@ -181,16 +182,7 @@ export default async function EventPage({
 
             {/* Spotify Playlist */}
             {event.spotify_url && (
-              <div className="rounded-xl overflow-hidden">
-                <iframe
-                  src={event.spotify_url.replace('open.spotify.com/', 'open.spotify.com/embed/')}
-                  width="100%"
-                  height="152"
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
-                  className="rounded-xl"
-                />
-              </div>
+              <SpotifyEmbed url={event.spotify_url} />
             )}
 
             {/* Registration Form */}

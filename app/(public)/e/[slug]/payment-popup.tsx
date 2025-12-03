@@ -9,6 +9,12 @@ type PaymentMethods = {
   bizum?: string
   cashapp?: string
   other?: string
+  bank_account?: {
+    bank_name?: string
+    account_holder?: string
+    iban?: string
+    bic?: string
+  }
 }
 
 const PAYMENT_CONFIG = {
@@ -18,6 +24,7 @@ const PAYMENT_CONFIG = {
   bizum: { label: 'Bizum', color: '#00C3B3', abbr: 'BI' },
   cashapp: { label: 'Cash App', color: '#00D632', abbr: 'CA' },
   other: { label: 'Other', color: '#525252', abbr: '🔗' },
+  bank_account: { label: 'Bank Transfer', color: '#1a365d', abbr: '🏦' },
 }
 
 function getPaymentUrl(method: string, tag: string, price: number, currency: string, note?: string): string | null {
@@ -55,20 +62,46 @@ type Props = {
 export default function PaymentPopup({ methods, price, currency, currencySymbol, eventTitle }: Props) {
   const [open, setOpen] = useState(false)
   
-  const activeMethodsCount = Object.entries(methods).filter(([_, v]) => v?.trim()).length
+  const activeMethodsCount = Object.entries(methods).filter(([k, v]) => {
+    if (k === 'bank_account') {
+      const bank = v as PaymentMethods['bank_account']
+      return bank?.iban?.trim()
+    }
+    return typeof v === 'string' && v.trim()
+  }).length
   
   if (activeMethodsCount === 0) return null
 
   // If only one payment method, just show direct link
   if (activeMethodsCount === 1) {
-    const [method, tag] = Object.entries(methods).find(([_, v]) => v?.trim())!
-    const url = getPaymentUrl(method, tag!, price, currency, eventTitle)
+    const entry = Object.entries(methods).find(([k, v]) => {
+      if (k === 'bank_account') {
+        const bank = v as PaymentMethods['bank_account']
+        return bank?.iban?.trim()
+      }
+      return typeof v === 'string' && v.trim()
+    })!
+    const [method, tag] = entry
+    
+    if (method === 'bank_account') {
+      const bank = tag as PaymentMethods['bank_account']
+      return (
+        <button 
+          onClick={() => setOpen(true)}
+          className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-medium transition-all hover:scale-105 shadow-lg shadow-emerald-900/30"
+        >
+          Bank Details →
+        </button>
+      )
+    }
+    
+    const url = getPaymentUrl(method, tag as string, price, currency, eventTitle)
     
     if (method === 'bizum') {
       return (
         <div className="text-right">
           <p className="text-xs text-emerald-500/70 mb-1">Bizum</p>
-          <p className="text-emerald-400 font-medium">{tag}</p>
+          <p className="text-emerald-400 font-medium">{tag as string}</p>
         </div>
       )
     }
@@ -124,7 +157,59 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
 
               <div className="space-y-2">
                 {Object.entries(methods).map(([method, tag]) => {
-                  if (!tag?.trim()) return null
+                  if (method === 'bank_account') {
+                    const bank = tag as PaymentMethods['bank_account']
+                    if (!bank?.iban?.trim()) return null
+                    
+                    const config = PAYMENT_CONFIG.bank_account
+                    return (
+                      <div
+                        key={method}
+                        className="p-4 rounded-xl bg-zinc-800/50 border border-zinc-700/50"
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          <div 
+                            className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0"
+                            style={{ backgroundColor: config.color }}
+                          >
+                            {config.abbr}
+                          </div>
+                          <div>
+                            <p className="text-zinc-200 font-medium">{config.label}</p>
+                            {bank.bank_name && <p className="text-zinc-500 text-sm">{bank.bank_name}</p>}
+                          </div>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          {bank.account_holder && (
+                            <div className="flex justify-between items-center p-2 bg-zinc-900/50 rounded-lg">
+                              <span className="text-zinc-500">Holder</span>
+                              <span className="text-zinc-200 font-mono">{bank.account_holder}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center p-2 bg-zinc-900/50 rounded-lg">
+                            <span className="text-zinc-500">IBAN</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-zinc-200 font-mono text-xs">{bank.iban}</span>
+                              <button
+                                onClick={() => navigator.clipboard.writeText(bank.iban || '')}
+                                className="px-2 py-1 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded text-xs transition-colors"
+                              >
+                                Copy
+                              </button>
+                            </div>
+                          </div>
+                          {bank.bic && (
+                            <div className="flex justify-between items-center p-2 bg-zinc-900/50 rounded-lg">
+                              <span className="text-zinc-500">BIC/SWIFT</span>
+                              <span className="text-zinc-200 font-mono">{bank.bic}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  }
+                  
+                  if (typeof tag !== 'string' || !tag?.trim()) return null
                   
                   const config = PAYMENT_CONFIG[method as keyof typeof PAYMENT_CONFIG]
                   const url = getPaymentUrl(method, tag, price, currency, eventTitle)
