@@ -63,24 +63,34 @@ export default async function EventPage({
     <div className="min-h-screen bg-zinc-950 relative overflow-hidden">
       <AnimatedBackground />
 
-      {/* Logo */}
+      {/* Logo - Desktop (top left, fixed) */}
       <Link 
         href="/" 
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 px-4 py-2 rounded-xl bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm border border-zinc-700/50 hover:border-zinc-600/50 hover:from-zinc-800 hover:to-zinc-900 transition-all shadow-lg shadow-black/20"
+        className="hidden sm:flex fixed top-6 left-6 z-50 px-4 py-2 rounded-xl bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm border border-zinc-700/50 hover:border-zinc-600/50 hover:from-zinc-800 hover:to-zinc-900 transition-all shadow-lg shadow-black/20"
       >
         <span className="font-bold text-xl text-zinc-100 tracking-tight">
           🎉 <span className="bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">iamin</span>
         </span>
       </Link>
 
+      {/* Logo - Mobile (top right, fixed) */}
+      <Link 
+        href="/" 
+        className="sm:hidden fixed top-4 right-4 z-50 px-4 py-2 rounded-xl bg-zinc-900/90 backdrop-blur-md border border-zinc-700/50 hover:bg-zinc-800 transition-all shadow-lg"
+      >
+        <span className="font-bold text-base text-zinc-100 tracking-tight">
+          🎉 <span className="bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">iamin</span>
+        </span>
+      </Link>
+
       <div className="relative flex flex-col lg:flex-row lg:h-screen">
         {/* Left Side - Event Details & Registration */}
-        <div className="w-full lg:w-[60%] p-6 pt-14 sm:pt-16 lg:p-12 lg:pt-16 lg:overflow-y-auto lg:h-screen">
+        <div className="w-full lg:w-[60%] p-6 pt-6 sm:pt-16 lg:p-12 lg:pt-16 lg:overflow-y-auto lg:h-screen">
           <div className="max-w-lg mx-auto w-full space-y-8">
             {/* Event Header */}
             <div className="flex flex-col sm:flex-row gap-4 items-start">
               {event.image_url && (
-                <div className="relative w-28 h-28 sm:w-36 sm:h-36 shrink-0 rounded-xl overflow-hidden shadow-xl shadow-black/40 ring-1 ring-zinc-800/50">
+                <div className="relative w-36 h-36 sm:w-36 sm:h-36 shrink-0 rounded-xl overflow-hidden shadow-xl shadow-black/40 ring-1 ring-zinc-800/50">
                   <Image
                     src={event.image_url}
                     alt={event.title}
