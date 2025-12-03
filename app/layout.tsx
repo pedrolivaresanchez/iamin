@@ -14,8 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Event Manager",
-  description: "Create and manage events with ease",
+  title: "IamIn - Event Management",
+  description: "Create events, share the link, see who's in.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
