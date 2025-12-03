@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import RegistrationForm from './registration-form'
 import AttendeesWall from './attendees-wall'
 import AnimatedBackground from './animated-background'
@@ -61,33 +62,46 @@ export default async function EventPage({
         <div className="w-full lg:w-[60%] p-6 lg:p-12 overflow-y-auto">
           <div className="max-w-lg mx-auto w-full space-y-8">
             {/* Event Header */}
-            <div>
-              <h1 className="text-4xl lg:text-5xl font-bold text-zinc-100 tracking-tight">
-                {event.title}
-              </h1>
-              {event.description && (
-                <p className="text-zinc-400 mt-3 text-base leading-snug">{event.description}</p>
+            <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+              {event.image_url && (
+                <div className="relative w-32 h-32 sm:w-28 sm:h-28 shrink-0 rounded-xl overflow-hidden shadow-xl shadow-black/40 ring-1 ring-zinc-800/50">
+                  <Image
+                    src={event.image_url}
+                    alt={event.title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                </div>
               )}
+              <div className="flex-1 min-w-0 text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-100 tracking-tight">
+                  {event.title}
+                </h1>
+                {event.description && (
+                  <p className="text-zinc-400 mt-1.5 sm:mt-2 text-sm leading-snug">{event.description}</p>
+                )}
+              </div>
             </div>
 
             {/* Date & Location Row */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-800/50 border border-zinc-700/50">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-800/50 border border-zinc-700/50 shrink-0">
                 <span>📅</span>
-                <span className="text-zinc-200 font-medium">{formatDate(event.date)}</span>
+                <span className="text-zinc-200 font-medium text-sm">{formatDate(event.date)}</span>
                 <span className="text-zinc-500">•</span>
-                <span className="text-zinc-400">{formatTime(event.date)}</span>
+                <span className="text-zinc-400 text-sm">{formatTime(event.date)}</span>
               </div>
               {event.location && (
                 <a 
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-800/50 border border-zinc-700/50 hover:bg-zinc-700/50 hover:border-zinc-600/50 transition-colors group"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-800/50 border border-zinc-700/50 hover:bg-zinc-700/50 hover:border-zinc-600/50 transition-colors group min-w-0"
                 >
-                  <span>📍</span>
-                  <span className="text-zinc-200 font-medium group-hover:text-white">{event.location}</span>
-                  <svg className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className="shrink-0">📍</span>
+                  <span className="text-zinc-200 font-medium group-hover:text-white text-sm truncate">{event.location}</span>
+                  <svg className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
                 </a>
@@ -119,6 +133,20 @@ export default async function EventPage({
               </div>
             )}
 
+            {/* Spotify Playlist */}
+            {event.spotify_url && (
+              <div className="rounded-xl overflow-hidden">
+                <iframe
+                  src={event.spotify_url.replace('open.spotify.com/', 'open.spotify.com/embed/')}
+                  width="100%"
+                  height="152"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                  className="rounded-xl"
+                />
+              </div>
+            )}
+
             {/* Registration Form */}
             <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-6 lg:p-8">
               <h2 className="text-xl font-semibold text-zinc-100 mb-1">Join this event</h2>
@@ -132,8 +160,8 @@ export default async function EventPage({
                 }} />
             </div>
 
-            {/* Footer CTA */}
-            <div className="mt-auto pt-8 border-t border-zinc-800/30">
+            {/* Footer CTA - Desktop only */}
+            <div className="hidden lg:block mt-auto pt-8 border-t border-zinc-800/30">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
                 <div>
                   <p className="text-zinc-500 text-sm">

@@ -73,6 +73,8 @@ export default async function EventDetailPage({
             price: event.price,
             currency: event.currency,
             payment_link: event.payment_link,
+            image_url: event.image_url,
+            spotify_url: event.spotify_url,
           }} />
         </div>
       </div>

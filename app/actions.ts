@@ -15,6 +15,8 @@ const createEventSchema = z.object({
   price: z.coerce.number().min(0).optional(),
   currency: z.string().default('USD'),
   payment_link: z.string().url().optional().or(z.literal('')),
+  image_url: z.string().optional(),
+  spotify_url: z.string().optional(),
 })
 
 const registerAttendeeSchema = z.object({
@@ -41,6 +43,35 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
   const priceValue = formData.get('price')
   const paymentLink = formData.get('payment_link') as string
   const currency = formData.get('currency') as string
+  const imageFile = formData.get('image') as File | null
+  
+  let imageUrl: string | null = null
+  
+  // Upload image if provided
+  if (imageFile && imageFile.size > 0) {
+    const fileExt = imageFile.name.split('.').pop()
+    const fileName = `${nanoid(12)}.${fileExt}`
+    
+    const { error: uploadError, data: uploadData } = await supabase.storage
+      .from('event-images')
+      .upload(fileName, imageFile, {
+        cacheControl: '3600',
+        upsert: false,
+      })
+    
+    if (uploadError) {
+      return { error: `Image upload failed: ${uploadError.message}` }
+    }
+    
+    const { data: { publicUrl } } = supabase.storage
+      .from('event-images')
+      .getPublicUrl(fileName)
+    
+    imageUrl = publicUrl
+  }
+  
+  const spotifyUrl = formData.get('spotify_url') as string
+  
   const rawData = {
     title: formData.get('title'),
     description: formData.get('description'),
@@ -49,6 +80,8 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
     price: priceValue ? Number(priceValue) : 0,
     currency: currency || 'USD',
     payment_link: paymentLink || null,
+    image_url: imageUrl,
+    spotify_url: spotifyUrl || null,
   }
 
   const parsed = createEventSchema.safeParse(rawData)
@@ -188,6 +221,36 @@ export async function updateEvent(prevState: ActionState, formData: FormData): P
   const priceValue = formData.get('price')
   const paymentLink = formData.get('payment_link') as string
   const currency = formData.get('currency') as string
+  const imageFile = formData.get('image') as File | null
+  const existingImageUrl = formData.get('existing_image_url') as string | null
+  
+  let imageUrl: string | null = existingImageUrl || null
+  
+  // Upload new image if provided
+  if (imageFile && imageFile.size > 0) {
+    const fileExt = imageFile.name.split('.').pop()
+    const fileName = `${nanoid(12)}.${fileExt}`
+    
+    const { error: uploadError } = await supabase.storage
+      .from('event-images')
+      .upload(fileName, imageFile, {
+        cacheControl: '3600',
+        upsert: false,
+      })
+    
+    if (uploadError) {
+      return { error: `Image upload failed: ${uploadError.message}` }
+    }
+    
+    const { data: { publicUrl } } = supabase.storage
+      .from('event-images')
+      .getPublicUrl(fileName)
+    
+    imageUrl = publicUrl
+  }
+  
+  const spotifyUrl = formData.get('spotify_url') as string
+  
   const rawData = {
     title: formData.get('title'),
     description: formData.get('description'),
@@ -196,6 +259,8 @@ export async function updateEvent(prevState: ActionState, formData: FormData): P
     price: priceValue ? Number(priceValue) : 0,
     currency: currency || 'USD',
     payment_link: paymentLink || null,
+    image_url: imageUrl,
+    spotify_url: spotifyUrl || null,
   }
 
   const parsed = createEventSchema.safeParse(rawData)

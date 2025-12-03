@@ -30,7 +30,7 @@ const WITTY_UNPAID = [
   "Card declined era 💳",
   "Waiting for payday 📅",
   "Budget vibes only 💅",
-  "Venmo pending... ⏳",
+  "Salary pending... ⏳",
   "Bank app loading 🔄",
   "Rich in spirit 🙏",
   "Trust fund pending 👑",
