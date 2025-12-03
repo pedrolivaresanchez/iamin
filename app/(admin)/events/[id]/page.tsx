@@ -104,7 +104,7 @@ export default async function EventDetailPage({
             className="inline-flex items-center gap-1.5 mt-2 py-1.5 px-3 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition-colors text-xs sm:text-sm"
           >
             📍 <span className="line-clamp-1">{event.location}</span>
-            <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </a>
@@ -112,31 +112,31 @@ export default async function EventDetailPage({
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
-        <Card className="border-zinc-800 bg-zinc-900">
-          <CardContent className="p-3 sm:p-5">
-            <p className="text-2xl sm:text-3xl font-bold text-zinc-100">{totalRegistered}</p>
-            <p className="text-xs sm:text-sm text-zinc-500 mt-0.5 sm:mt-1">Total Guests</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        <Card className="border-zinc-800 bg-zinc-900 py-0 gap-0">
+          <CardContent className="p-3 sm:p-4">
+            <p className="text-xl sm:text-2xl font-bold text-zinc-100">{totalRegistered}</p>
+            <p className="text-xs text-zinc-500">Total Guests</p>
           </CardContent>
         </Card>
-        <Card className="border-zinc-800 bg-emerald-950/20 border-emerald-900/30">
-          <CardContent className="p-3 sm:p-5">
-            <p className="text-2xl sm:text-3xl font-bold text-emerald-400">{paidCount}</p>
-            <p className="text-xs sm:text-sm text-emerald-500/70 mt-0.5 sm:mt-1">Paid</p>
+        <Card className="border-zinc-800 bg-emerald-950/20 border-emerald-900/30 py-0 gap-0">
+          <CardContent className="p-3 sm:p-4">
+            <p className="text-xl sm:text-2xl font-bold text-emerald-400">{paidCount}</p>
+            <p className="text-xs text-emerald-500/70">Paid</p>
           </CardContent>
         </Card>
-        <Card className="border-zinc-800 bg-red-950/20 border-red-900/30">
-          <CardContent className="p-3 sm:p-5">
-            <p className="text-2xl sm:text-3xl font-bold text-red-400">{unpaidCount}</p>
-            <p className="text-xs sm:text-sm text-red-500/70 mt-0.5 sm:mt-1">Not Paid</p>
+        <Card className="border-zinc-800 bg-red-950/20 border-red-900/30 py-0 gap-0">
+          <CardContent className="p-3 sm:p-4">
+            <p className="text-xl sm:text-2xl font-bold text-red-400">{unpaidCount}</p>
+            <p className="text-xs text-red-500/70">Not Paid</p>
           </CardContent>
         </Card>
-        <Card className="border-zinc-800 bg-zinc-900">
-          <CardContent className="p-3 sm:p-5">
-            <p className="text-2xl sm:text-3xl font-bold text-zinc-100">
+        <Card className="border-zinc-800 bg-zinc-900 py-0 gap-0">
+          <CardContent className="p-3 sm:p-4">
+            <p className="text-xl sm:text-2xl font-bold text-zinc-100">
               {totalRegistered > 0 ? Math.round((paidCount / totalRegistered) * 100) : 0}%
             </p>
-            <p className="text-xs sm:text-sm text-zinc-500 mt-0.5 sm:mt-1">Payment Rate</p>
+            <p className="text-xs text-zinc-500">Payment Rate</p>
           </CardContent>
         </Card>
       </div>

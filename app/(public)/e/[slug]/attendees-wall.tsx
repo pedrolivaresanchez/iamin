@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import ShareButton from './share-button'
+import Link from 'next/link'
 
 type Attendee = {
   id: string
@@ -22,6 +23,41 @@ const WITTY_UNPAID = [
   "Saving for snacks 🍿",
   "Piggy bank raid 🐷",
   "Counting coins... 🪙",
+  "Asking mom for cash 📞",
+  "Selling old socks 🧦",
+  "Checking couch cushions 🛋️",
+  "Crypto crashed again 📉",
+  "Card declined era 💳",
+  "Waiting for payday 📅",
+  "Budget vibes only 💅",
+  "Venmo pending... ⏳",
+  "Bank app loading 🔄",
+  "Rich in spirit 🙏",
+  "Trust fund pending 👑",
+  "Will pay in hugs 🤗",
+  "IOU energy 📝",
+  "Manifesting funds ✨",
+  "Broke but make it fashion 💁",
+  "Payment plot twist 🎬",
+  "Financially quirky 🦋",
+  "Sugar daddy MIA 🍬",
+  "Rent came first 🏠",
+  "Avocado toast victim 🥑",
+  "Student loan survivor 🎓",
+  "Coffee > payments ☕",
+  "Netflix ate my money 📺",
+  "Uber Eats trauma 🍔",
+  "Wine fund depleted 🍷",
+  "Gym membership regret 🏋️",
+  "Plant parent expenses 🪴",
+  "Cat demanded treats 🐱",
+  "Dog needed sweater 🐕",
+  "Spotify wrapped me 🎵",
+  "Amazon cart attack 📦",
+  "Sale shopping casualty 🛍️",
+  "Brunch bankruptcy 🥞",
+  "Oat milk premium 🥛",
+  "Therapy session funds 🧠",
 ]
 
 function getUniqueEmoji(usedEmojis: Set<string>): string {
@@ -167,6 +203,18 @@ export default function AttendeesWall({
             <p className="text-zinc-600 text-sm mt-1">Be the first to register!</p>
           </div>
         )}
+      </div>
+
+      {/* Powered by - Mobile only */}
+      <div className="lg:hidden mt-6 pt-6 border-t border-zinc-800/50 text-center">
+        <p className="text-zinc-500 text-sm">Powered by <span className="text-zinc-300 font-medium">🎉 IamIn</span></p>
+        <p className="text-zinc-600 text-xs mt-1">Create events & track RSVPs in seconds</p>
+        <Link 
+          href="/signup"
+          className="inline-block mt-3 px-4 py-2 text-sm font-medium text-zinc-900 bg-zinc-100 hover:bg-white rounded-lg transition-colors"
+        >
+          Create Your Own Event →
+        </Link>
       </div>
     </div>
   )
