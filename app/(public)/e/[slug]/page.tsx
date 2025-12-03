@@ -8,11 +8,12 @@ import AttendeesWall from './attendees-wall'
 import AnimatedBackground from './animated-background'
 import { Button } from '@/components/ui/button'
 import { getCurrencySymbol, getCurrencyFlag } from '@/lib/currencies'
+import PaymentPopup from './payment-popup'
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
   return date.toLocaleDateString('en-US', {
-    weekday: 'short',
+    weekday: 'long',
     month: 'short',
     day: 'numeric',
     timeZone: 'UTC'
@@ -22,10 +23,11 @@ function formatDate(dateString: string): string {
 function formatTime(dateString: string): string {
   const date = new Date(dateString)
   return date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
+    hour: 'numeric',
     minute: '2-digit',
+    hour12: true,
     timeZone: 'UTC'
-  })
+  }).toLowerCase()
 }
 
 export default async function EventPage({
@@ -53,17 +55,21 @@ export default async function EventPage({
     .order('registered_at', { ascending: false })
 
   const hasPrice = event.price !== null && event.price !== undefined && Number(event.price) > 0
+  const totalAttendees = attendees?.length || 0
+  const hasMaxSpots = event.max_spots !== null && event.max_spots !== undefined && event.max_spots > 0
+  const spotsLeft = hasMaxSpots ? event.max_spots - totalAttendees : null
+  const isFull = hasMaxSpots && spotsLeft !== null && spotsLeft <= 0
 
   return (
     <div className="min-h-screen bg-zinc-950 relative overflow-hidden">
       <AnimatedBackground />
 
-      <div className="relative flex flex-col lg:flex-row min-h-screen">
+      <div className="relative flex flex-col lg:flex-row lg:h-screen">
         {/* Left Side - Event Details & Registration */}
-        <div className="w-full lg:w-[60%] p-6 lg:p-12 overflow-y-auto">
+        <div className="w-full lg:w-[60%] p-6 lg:p-12 lg:overflow-y-auto lg:h-screen">
           <div className="max-w-lg mx-auto w-full space-y-8">
             {/* Event Header */}
-            <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+            <div className="flex flex-col sm:flex-row gap-4 items-start">
               {event.image_url && (
                 <div className="relative w-28 h-28 sm:w-36 sm:h-36 shrink-0 rounded-xl overflow-hidden shadow-xl shadow-black/40 ring-1 ring-zinc-800/50">
                   <Image
@@ -75,62 +81,99 @@ export default async function EventPage({
                   />
                 </div>
               )}
-              <div className="flex-1 min-w-0 text-center sm:text-left">
+              <div className="flex-1 min-w-0 text-left">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-100 tracking-tight">
-                  {event.title}
-                </h1>
-                {event.description && (
-                  <div className="text-zinc-400 mt-1.5 sm:mt-2 text-sm leading-relaxed prose prose-sm prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:text-zinc-200 prose-strong:text-zinc-200 prose-a:text-emerald-400 max-w-none">
+                {event.title}
+              </h1>
+              {event.host_name && (
+                <p className="text-zinc-500 text-sm mt-1.5 flex items-center gap-1.5">
+                  <span>👑</span> Hosted by <span className="text-zinc-300">{event.host_name}</span>
+                </p>
+              )}
+              {event.description && (
+                  <div className="text-zinc-400 mt-2 sm:mt-3 text-sm leading-relaxed prose prose-sm prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:text-zinc-200 prose-strong:text-zinc-200 prose-a:text-emerald-400 max-w-none">
                     <ReactMarkdown>{event.description}</ReactMarkdown>
                   </div>
-                )}
+              )}
               </div>
             </div>
 
-            {/* Date & Location Row */}
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-800/50 border border-zinc-700/50 shrink-0">
-                <span>📅</span>
-                <span className="text-zinc-200 font-medium text-sm">{formatDate(event.date)}</span>
-                <span className="text-zinc-500">•</span>
-                <span className="text-zinc-400 text-sm">{formatTime(event.date)}</span>
+            {/* Date & Time */}
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
               </div>
-              {event.location && (
-                <a 
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-800/50 border border-zinc-700/50 hover:bg-zinc-700/50 hover:border-zinc-600/50 transition-colors group min-w-0"
-                >
-                  <span className="shrink-0">📍</span>
-                  <span className="text-zinc-200 font-medium group-hover:text-white text-sm truncate">{event.location}</span>
-                  <svg className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-              )}
+              <div>
+                <p className="text-zinc-200 font-medium">{formatDate(event.date)}</p>
+                <p className="text-zinc-500 text-sm mt-0.5">{formatTime(event.date)}</p>
+              </div>
             </div>
+
+            {/* Location */}
+            {event.location && (
+              <a 
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-3"
+              >
+                <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0 group-hover:bg-rose-500/20 transition-colors">
+                  <svg className="w-5 h-5 text-rose-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-zinc-200 font-medium group-hover:text-white transition-colors">{event.location}</p>
+                  <p className="text-zinc-500 text-sm mt-0.5 group-hover:text-zinc-400 transition-colors flex items-center gap-1">
+                    View on Maps
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </p>
+                </div>
+              </a>
+            )}
+
+
+            {/* Spots Info */}
+            {hasMaxSpots && (
+              <div className="flex items-start gap-3">
+                <div className={`w-10 h-10 rounded-xl ${isFull ? 'bg-red-500/10 border-red-500/20' : 'bg-amber-500/10 border-amber-500/20'} border flex items-center justify-center shrink-0`}>
+                  <svg className={`w-5 h-5 ${isFull ? 'text-red-400' : 'text-amber-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className={`font-medium ${isFull ? 'text-red-400' : 'text-zinc-200'}`}>
+                    {isFull ? 'Event Full' : `${spotsLeft} spots left`}
+                  </p>
+                  <p className="text-zinc-500 text-sm mt-0.5">{totalAttendees} / {event.max_spots} registered</p>
+                </div>
+              </div>
+            )}
 
             {/* Payment Section */}
             {hasPrice && (
               <div className="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-900/30">
+                <p className="text-xs text-emerald-500/70 uppercase tracking-wide font-medium mb-2">Event Price</p>
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{getCurrencyFlag(event.currency)}</span>
-                    <p className="font-bold text-emerald-400 text-xl">
+                    <p className="font-bold text-emerald-400 text-2xl">
                       {getCurrencySymbol(event.currency)}{Number(event.price).toFixed(2)}
                     </p>
                     <span className="text-sm text-emerald-500/70">{event.currency || 'USD'}</span>
                   </div>
-                  {event.payment_link && (
-                    <a 
-                      href={event.payment_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-medium transition-all hover:scale-105 shadow-lg shadow-emerald-900/30"
-                    >
-                      Pay Now →
-                    </a>
+                  {event.payment_methods && (
+                    <PaymentPopup 
+                      methods={event.payment_methods}
+                      price={Number(event.price)}
+                      currency={event.currency || 'USD'}
+                      currencySymbol={getCurrencySymbol(event.currency)}
+                      eventTitle={event.title}
+                    />
                   )}
                 </div>
               </div>
@@ -152,15 +195,25 @@ export default async function EventPage({
 
             {/* Registration Form */}
             <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-6 lg:p-8">
-              <h2 className="text-xl font-semibold text-zinc-100 mb-1">Join this event</h2>
-              <p className="text-sm text-zinc-500 mb-6">Fill in your details to register</p>
-              <RegistrationForm event={{
-                  id: event.id,
-                  title: event.title,
-                  description: event.description,
-                  date: event.date,
-                  location: event.location,
-                }} />
+              {isFull ? (
+                <div className="text-center py-4">
+                  <div className="text-4xl mb-3">😢</div>
+                  <h2 className="text-xl font-semibold text-zinc-100 mb-1">Event Full</h2>
+                  <p className="text-sm text-zinc-500">All spots have been taken</p>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-xl font-semibold text-zinc-100 mb-1">Join this event</h2>
+                  <p className="text-sm text-zinc-500 mb-6">Fill in your details to register</p>
+                  <RegistrationForm event={{
+                      id: event.id,
+                      title: event.title,
+                      description: event.description,
+                      date: event.date,
+                      location: event.location,
+                    }} />
+                </>
+              )}
             </div>
 
             {/* Footer CTA - Desktop only */}
@@ -183,8 +236,8 @@ export default async function EventPage({
         </div>
 
         {/* Right Side - Wall of Attendees */}
-        <div className="w-full lg:w-[40%] bg-zinc-900/30 backdrop-blur-sm border-l border-zinc-800/50 p-6 lg:p-8">
-          <div className="h-full lg:sticky lg:top-8">
+        <div className="w-full lg:w-[40%] lg:h-screen lg:overflow-y-auto bg-zinc-900/30 backdrop-blur-sm border-l border-zinc-800/50 p-6 pb-12 lg:p-8 lg:pb-16">
+          <div className="h-full">
             <AttendeesWall 
               eventId={event.id} 
               initialAttendees={attendees?.map(a => ({

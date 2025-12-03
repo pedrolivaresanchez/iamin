@@ -12,11 +12,20 @@ const createEventSchema = z.object({
   description: z.string().optional(),
   date: z.string().min(1, 'Date is required'),
   location: z.string().optional(),
+  host_name: z.string().optional(),
   price: z.coerce.number().min(0).optional(),
   currency: z.string().default('USD'),
-  payment_link: z.string().url().optional().or(z.literal('')),
+  payment_methods: z.object({
+    revolut: z.string().optional(),
+    paypal: z.string().optional(),
+    venmo: z.string().optional(),
+    bizum: z.string().optional(),
+    cashapp: z.string().optional(),
+    other: z.string().optional(),
+  }).optional(),
   image_url: z.string().optional(),
   spotify_url: z.string().optional(),
+  max_spots: z.coerce.number().min(0).optional(),
 })
 
 const registerAttendeeSchema = z.object({
@@ -71,17 +80,38 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
   }
   
   const spotifyUrl = formData.get('spotify_url') as string
+  const maxSpotsValue = formData.get('max_spots')
+  
+  // Collect payment methods
+  const paymentMethods = {
+    revolut: formData.get('payment_revolut') as string || undefined,
+    paypal: formData.get('payment_paypal') as string || undefined,
+    venmo: formData.get('payment_venmo') as string || undefined,
+    bizum: formData.get('payment_bizum') as string || undefined,
+    cashapp: formData.get('payment_cashapp') as string || undefined,
+    other: formData.get('payment_other') as string || undefined,
+  }
+  // Clean empty values
+  Object.keys(paymentMethods).forEach(key => {
+    if (!paymentMethods[key as keyof typeof paymentMethods]?.trim()) {
+      delete paymentMethods[key as keyof typeof paymentMethods]
+    }
+  })
+  
+  const hostName = formData.get('host_name') as string
   
   const rawData = {
     title: formData.get('title'),
     description: formData.get('description'),
     date: formData.get('date'),
     location: formData.get('location'),
+    host_name: hostName || null,
     price: priceValue ? Number(priceValue) : 0,
     currency: currency || 'USD',
-    payment_link: paymentLink || null,
+    payment_methods: Object.keys(paymentMethods).length > 0 ? paymentMethods : null,
     image_url: imageUrl,
     spotify_url: spotifyUrl || null,
+    max_spots: maxSpotsValue ? Number(maxSpotsValue) : null,
   }
 
   const parsed = createEventSchema.safeParse(rawData)
@@ -116,11 +146,30 @@ export async function registerAttendee(prevState: ActionState, formData: FormDat
   const countryCode = formData.get('country_code') as string
   const phoneNumber = formData.get('phone') as string
   const fullPhone = `${countryCode}${phoneNumber}`
+  const eventId = formData.get('event_id') as string
+
+  // Check if event is full
+  const { data: event } = await supabase
+    .from('events')
+    .select('max_spots')
+    .eq('id', eventId)
+    .single()
+
+  if (event?.max_spots) {
+    const { count } = await supabase
+      .from('attendees')
+      .select('*', { count: 'exact', head: true })
+      .eq('event_id', eventId)
+
+    if (count !== null && count >= event.max_spots) {
+      return { error: 'Sorry, this event is full' }
+    }
+  }
 
   const rawData = {
     full_name: formData.get('full_name'),
     phone: fullPhone,
-    event_id: formData.get('event_id'),
+    event_id: eventId,
   }
 
   const parsed = registerAttendeeSchema.safeParse(rawData)
@@ -250,17 +299,38 @@ export async function updateEvent(prevState: ActionState, formData: FormData): P
   }
   
   const spotifyUrl = formData.get('spotify_url') as string
+  const maxSpotsValue = formData.get('max_spots')
+  
+  // Collect payment methods
+  const paymentMethods = {
+    revolut: formData.get('payment_revolut') as string || undefined,
+    paypal: formData.get('payment_paypal') as string || undefined,
+    venmo: formData.get('payment_venmo') as string || undefined,
+    bizum: formData.get('payment_bizum') as string || undefined,
+    cashapp: formData.get('payment_cashapp') as string || undefined,
+    other: formData.get('payment_other') as string || undefined,
+  }
+  // Clean empty values
+  Object.keys(paymentMethods).forEach(key => {
+    if (!paymentMethods[key as keyof typeof paymentMethods]?.trim()) {
+      delete paymentMethods[key as keyof typeof paymentMethods]
+    }
+  })
+  
+  const hostName = formData.get('host_name') as string
   
   const rawData = {
     title: formData.get('title'),
     description: formData.get('description'),
     date: formData.get('date'),
     location: formData.get('location'),
+    host_name: hostName || null,
     price: priceValue ? Number(priceValue) : 0,
     currency: currency || 'USD',
-    payment_link: paymentLink || null,
+    payment_methods: Object.keys(paymentMethods).length > 0 ? paymentMethods : null,
     image_url: imageUrl,
     spotify_url: spotifyUrl || null,
+    max_spots: maxSpotsValue ? Number(maxSpotsValue) : null,
   }
 
   const parsed = createEventSchema.safeParse(rawData)

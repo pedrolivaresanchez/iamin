@@ -30,34 +30,44 @@ const WITTY_UNPAID = [
   "Card declined era 💳",
   "Waiting for payday 📅",
   "Budget vibes only 💅",
-  "Salary pending... ⏳",
+  "Venmo pending... ⏳",
   "Bank app loading 🔄",
   "Rich in spirit 🙏",
   "Trust fund pending 👑",
   "Will pay in hugs 🤗",
   "IOU energy 📝",
   "Manifesting funds ✨",
-  "Broke but make it fashion 💁",
+  "Broke but fashion 💁",
   "Payment plot twist 🎬",
   "Financially quirky 🦋",
   "Sugar daddy MIA 🍬",
   "Rent came first 🏠",
   "Avocado toast victim 🥑",
-  "Student loan survivor 🎓",
+  "Student loan era 🎓",
   "Coffee > payments ☕",
-  "Netflix ate my money 📺",
+  "Netflix ate it 📺",
   "Uber Eats trauma 🍔",
-  "Wine fund depleted 🍷",
-  "Gym membership regret 🏋️",
-  "Plant parent expenses 🪴",
-  "Cat demanded treats 🐱",
-  "Dog needed sweater 🐕",
+  "Wine fund empty 🍷",
+  "Gym regret paying 🏋️",
+  "Plant parent life 🪴",
+  "Cat needed treats 🐱",
+  "Dog ate my wallet 🐕",
   "Spotify wrapped me 🎵",
   "Amazon cart attack 📦",
-  "Sale shopping casualty 🛍️",
+  "Sale casualty 🛍️",
   "Brunch bankruptcy 🥞",
   "Oat milk premium 🥛",
-  "Therapy session funds 🧠",
+  "Therapy first 🧠",
+  "Sushi splurge 🍣",
+  "Concert tickets 🎫",
+  "New shoes priority 👟",
+  "Skincare addiction 🧴",
+  "Tattoo fund 🎨",
+  "Gaming setup 🎮",
+  "Festival season 🎪",
+  "Vacation mode 🏖️",
+  "Wedding season 💒",
+  "Birthday month 🎂",
 ]
 
 function getUniqueEmoji(usedEmojis: Set<string>): string {
@@ -68,9 +78,9 @@ function getUniqueEmoji(usedEmojis: Set<string>): string {
   return FUN_EMOJIS[Math.floor(Math.random() * FUN_EMOJIS.length)]
 }
 
-function getWittyPhrase(id: string): string {
-  const index = id.charCodeAt(0) % WITTY_UNPAID.length
-  return WITTY_UNPAID[index]
+function getWittyPhrase(id: string, index: number): string {
+  // Use index to ensure no repeats within the list
+  return WITTY_UNPAID[index % WITTY_UNPAID.length]
 }
 
 export default function AttendeesWall({ 
@@ -143,7 +153,7 @@ export default function AttendeesWall({
   }, [eventId])
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
@@ -164,7 +174,7 @@ export default function AttendeesWall({
         </div>
       </div>
       
-      <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+      <div className="space-y-2 mb-6">
         {attendees.length > 0 ? (
           attendees.map((attendee, index) => (
             <div
@@ -181,7 +191,7 @@ export default function AttendeesWall({
                 </p>
                 {!attendee.payment_confirmed && (
                   <p className="text-xs text-amber-500/70 truncate">
-                    {getWittyPhrase(attendee.id)}
+                    {getWittyPhrase(attendee.id, index)}
                   </p>
                 )}
               </div>
@@ -206,7 +216,7 @@ export default function AttendeesWall({
       </div>
 
       {/* Powered by - Mobile only */}
-      <div className="lg:hidden mt-6 pt-6 border-t border-zinc-800/50 text-center">
+      <div className="lg:hidden mt-8 pt-6 pb-8 border-t border-zinc-800/50 text-center">
         <p className="text-zinc-500 text-sm">Powered by <span className="text-zinc-300 font-medium">🎉 iamin</span></p>
         <p className="text-zinc-600 text-xs mt-1">Create events & track RSVPs in seconds</p>
         <Link 

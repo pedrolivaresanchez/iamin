@@ -70,11 +70,13 @@ export default async function EventDetailPage({
             description: event.description,
             date: event.date,
             location: event.location,
+            host_name: event.host_name,
             price: event.price,
             currency: event.currency,
-            payment_link: event.payment_link,
+            payment_methods: event.payment_methods,
             image_url: event.image_url,
             spotify_url: event.spotify_url,
+            max_spots: event.max_spots,
           }} />
         </div>
       </div>

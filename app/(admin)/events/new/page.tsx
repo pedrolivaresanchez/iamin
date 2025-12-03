@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { DateTimePicker } from '@/components/ui/date-time-picker'
 import { Spinner } from '@/components/ui/spinner'
 import { LocationInput } from '@/components/ui/location-input'
+import { PaymentMethodsDialog, PaymentMethodsInputs, type PaymentMethods } from '@/components/ui/payment-methods-dialog'
 import Image from 'next/image'
 import {
   Select,
@@ -54,6 +55,7 @@ function SubmitButton() {
 export default function NewEventPage() {
   const [state, formAction] = useActionState<ActionState, FormData>(createEvent, {})
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethods>({})
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,6 +176,17 @@ export default function NewEventPage() {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="host_name" className="text-zinc-300">Host Name (optional)</Label>
+              <Input
+                type="text"
+                id="host_name"
+                name="host_name"
+                className="bg-zinc-800 border-zinc-700 text-zinc-100"
+                placeholder="John Doe"
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="price" className="text-zinc-300">Price</Label>
@@ -210,15 +223,26 @@ export default function NewEventPage() {
             <p className="text-xs text-zinc-500 -mt-4">Leave price at 0 for free events</p>
 
             <div className="space-y-2">
-              <Label htmlFor="payment_link" className="text-zinc-300">Payment Link (optional)</Label>
+              <Label htmlFor="max_spots" className="text-zinc-300">Max Spots (optional)</Label>
               <Input
-                type="url"
-                id="payment_link"
-                name="payment_link"
+                type="number"
+                id="max_spots"
+                name="max_spots"
+                min="1"
                 className="bg-zinc-800 border-zinc-700 text-zinc-100"
-                placeholder="https://paypal.me/... or https://revolut.me/..."
+                placeholder="Unlimited"
               />
-              <p className="text-xs text-zinc-500">Stripe, PayPal, Revolut, or any payment link</p>
+              <p className="text-xs text-zinc-500">Leave empty for unlimited spots</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-zinc-300">Payment Methods (optional)</Label>
+              <PaymentMethodsDialog 
+                value={paymentMethods} 
+                onChange={setPaymentMethods} 
+              />
+              <PaymentMethodsInputs methods={paymentMethods} />
+              <p className="text-xs text-zinc-500">Configure how guests can pay you</p>
             </div>
 
             <div className="space-y-2">
