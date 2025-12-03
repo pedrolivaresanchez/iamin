@@ -30,7 +30,7 @@ export function generateIcsFile(event: CalendarEvent): string {
   const icsContent = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//IamIn//Event//EN',
+    'PRODID:-//iamin//Event//EN',
     'BEGIN:VEVENT',
     `DTSTART:${formatDate(event.startDate)}`,
     `DTEND:${formatDate(event.endDate)}`,

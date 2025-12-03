@@ -207,7 +207,7 @@ export default function AttendeesWall({
 
       {/* Powered by - Mobile only */}
       <div className="lg:hidden mt-6 pt-6 border-t border-zinc-800/50 text-center">
-        <p className="text-zinc-500 text-sm">Powered by <span className="text-zinc-300 font-medium">🎉 IamIn</span></p>
+        <p className="text-zinc-500 text-sm">Powered by <span className="text-zinc-300 font-medium">🎉 iamin</span></p>
         <p className="text-zinc-600 text-xs mt-1">Create events & track RSVPs in seconds</p>
         <Link 
           href="/signup"

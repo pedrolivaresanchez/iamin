@@ -25,7 +25,7 @@ export default async function AdminLayout({
             <div className="flex justify-between h-14 sm:h-16">
               <div className="flex items-center gap-2 sm:gap-6">
                 <Link href="/dashboard" className="font-bold text-lg sm:text-xl text-zinc-100 tracking-tight">
-                  🎉 <span className="bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">IamIn</span>
+                  🎉 <span className="bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">iamin</span>
                 </Link>
                 <Separator orientation="vertical" className="h-5 sm:h-6 bg-zinc-700/50 hidden sm:block" />
                 <div className="hidden sm:flex gap-1">

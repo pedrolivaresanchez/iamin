@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IamIn - Event Management",
+  title: "iamin - Event Management",
   description: "Create events, share the link, see who's in.",
   icons: {
     icon: "/icon.svg",

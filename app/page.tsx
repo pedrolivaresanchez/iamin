@@ -8,7 +8,7 @@ export default function HomePage() {
         <div className="mb-8">
           <div className="text-6xl mb-6">🎉</div>
           <h1 className="text-5xl font-bold tracking-tight text-zinc-100 mb-3">
-            <span className="bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">IamIn</span>
+            <span className="bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">iamin</span>
           </h1>
           <p className="text-xl text-zinc-500 max-w-md mx-auto">
             Create events. Share the link. See who&apos;s in.

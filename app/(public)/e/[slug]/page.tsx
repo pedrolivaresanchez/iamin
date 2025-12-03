@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import ReactMarkdown from 'react-markdown'
 import RegistrationForm from './registration-form'
 import AttendeesWall from './attendees-wall'
 import AnimatedBackground from './animated-background'
@@ -64,7 +65,7 @@ export default async function EventPage({
             {/* Event Header */}
             <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
               {event.image_url && (
-                <div className="relative w-32 h-32 sm:w-28 sm:h-28 shrink-0 rounded-xl overflow-hidden shadow-xl shadow-black/40 ring-1 ring-zinc-800/50">
+                <div className="relative w-28 h-28 sm:w-36 sm:h-36 shrink-0 rounded-xl overflow-hidden shadow-xl shadow-black/40 ring-1 ring-zinc-800/50">
                   <Image
                     src={event.image_url}
                     alt={event.title}
@@ -79,7 +80,9 @@ export default async function EventPage({
                   {event.title}
                 </h1>
                 {event.description && (
-                  <p className="text-zinc-400 mt-1.5 sm:mt-2 text-sm leading-snug">{event.description}</p>
+                  <div className="text-zinc-400 mt-1.5 sm:mt-2 text-sm leading-relaxed prose prose-sm prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:text-zinc-200 prose-strong:text-zinc-200 prose-a:text-emerald-400 max-w-none">
+                    <ReactMarkdown>{event.description}</ReactMarkdown>
+                  </div>
                 )}
               </div>
             </div>
@@ -165,7 +168,7 @@ export default async function EventPage({
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
                 <div>
                   <p className="text-zinc-500 text-sm">
-                    Powered by <span className="font-semibold text-zinc-300">🎉 IamIn</span>
+                    Powered by <span className="font-semibold text-zinc-300">🎉 iamin</span>
                   </p>
                   <p className="text-zinc-600 text-xs mt-0.5">
                     Create events & track RSVPs in seconds
