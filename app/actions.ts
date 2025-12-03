@@ -53,7 +53,7 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
 
   const parsed = createEventSchema.safeParse(rawData)
   if (!parsed.success) {
-    return { error: parsed.error.errors[0].message }
+    return { error: parsed.error.issues[0].message }
   }
 
   // Auto-generate unique slug (12 chars = ~4.7 sextillion combinations)
@@ -92,7 +92,7 @@ export async function registerAttendee(prevState: ActionState, formData: FormDat
 
   const parsed = registerAttendeeSchema.safeParse(rawData)
   if (!parsed.success) {
-    return { error: parsed.error.errors[0].message }
+    return { error: parsed.error.issues[0].message }
   }
 
   const { error } = await supabase.from('attendees').insert(parsed.data)
@@ -200,7 +200,7 @@ export async function updateEvent(prevState: ActionState, formData: FormData): P
 
   const parsed = createEventSchema.safeParse(rawData)
   if (!parsed.success) {
-    return { error: parsed.error.errors[0].message }
+    return { error: parsed.error.issues[0].message }
   }
 
   const { error } = await supabase
