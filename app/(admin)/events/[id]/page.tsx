@@ -148,13 +148,13 @@ export default async function EventDetailPage({
       {/* Attendees Section */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Chart - Hidden on mobile, shown as small card */}
-        <Card className="border-zinc-800 bg-zinc-900 hidden sm:block">
-          <CardHeader className="pb-2">
+        <Card className="border-zinc-800 bg-zinc-900 hidden sm:block h-fit">
+          <CardHeader className="pb-1 pt-4">
             <CardTitle className="text-sm font-medium text-zinc-400">Payment Status</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0 pb-4">
             <PaymentChart paidCount={paidCount} unpaidCount={unpaidCount} />
-            <div className="flex justify-center gap-4 mt-4 text-xs">
+            <div className="flex justify-center gap-4 mt-3 text-xs">
               <div className="flex items-center gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                 <span className="text-zinc-500">Paid</span>

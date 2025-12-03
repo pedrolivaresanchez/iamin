@@ -35,14 +35,14 @@ export default function PaymentChart({
 
   if (total === 0) {
     return (
-      <div className="flex items-center justify-center h-[200px] text-zinc-500">
+      <div className="flex items-center justify-center h-[160px] text-zinc-500">
         No attendees yet
       </div>
     )
   }
 
   return (
-    <ChartContainer config={chartConfig} className="h-[200px] w-full">
+    <ChartContainer config={chartConfig} className="h-[160px] w-full">
       <PieChart>
         <Pie
           data={data}

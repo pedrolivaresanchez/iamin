@@ -23,10 +23,12 @@ const PAYMENT_CONFIG = {
 function getPaymentUrl(method: string, tag: string, price: number, currency: string, note?: string): string | null {
   const amount = price.toFixed(2)
   const encodedNote = note ? encodeURIComponent(note) : 'Event%20Payment'
+  // Revolut expects amount in smallest currency unit (cents/fils)
+  const revolutAmount = Math.round(price * 100)
   
   switch (method) {
     case 'revolut':
-      return `https://revolut.me/${tag.replace('@', '')}?currency=${currency}&amount=${price}&note=${encodedNote}`
+      return `https://revolut.me/${tag.replace('@', '')}?currency=${currency}&amount=${revolutAmount}&note=${encodedNote}`
     case 'paypal':
       return `https://paypal.me/${tag.replace('@', '')}/${amount}${currency}`
     case 'venmo':

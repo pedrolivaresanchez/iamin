@@ -52,19 +52,6 @@ type Attendee = {
   registered_at: string
 }
 
-const WITTY_MESSAGES = [
-  "Still holding out on us! 😉",
-  "Money's on the way... right? 💸",
-  "We believe in you! 🤞",
-  "The wallet's a bit shy 🙈",
-  "Saving up? We get it! 💰",
-]
-
-function getWittyMessage(id: string) {
-  const index = id.charCodeAt(0) % WITTY_MESSAGES.length
-  return WITTY_MESSAGES[index]
-}
-
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
   const day = date.getUTCDate()
@@ -162,11 +149,6 @@ function AttendeeRow({ attendee, eventId }: { attendee: Attendee; eventId: strin
             >
               {attendee.phone}
             </a>
-            {!attendee.payment_confirmed && (
-              <span className="text-xs text-amber-500/70 mt-1">
-                {getWittyMessage(attendee.id)}
-              </span>
-            )}
           </div>
         </TableCell>
         <TableCell>
