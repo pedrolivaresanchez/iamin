@@ -23,7 +23,7 @@ const PAYMENT_CONFIG = {
   revolut: { label: 'Revolut', color: '#0075EB', abbr: 'RE', logo: 'https://assets.revolut.com/assets/brand/Revolut-Symbol-Black.svg' },
   paypal: { label: 'PayPal', color: '#003087', abbr: 'PP', logo: 'https://www.paypalobjects.com/webstatic/icon/pp258.png' },
   venmo: { label: 'Venmo', color: '#008CFF', abbr: 'V', logo: '/folder/venmo.svg' },
-  bizum: { label: 'Bizum', color: '#05C3C3', abbr: 'B', logo: '/folder/bizum.png' },
+  bizum: { label: 'Bizum', color: '#05C3C3', abbr: 'B', logo: null },
   cashapp: { label: 'Cash App', color: '#00D632', abbr: '$', logo: null },
   other: { label: 'Other', color: '#525252', abbr: '🔗', logo: null },
   bank_account: { label: 'Bank Transfer', color: '#1a365d', abbr: '🏦', logo: null },

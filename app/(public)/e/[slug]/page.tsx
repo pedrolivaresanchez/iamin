@@ -108,6 +108,21 @@ export default async function EventPage({
     notFound()
   }
 
+  if (event.enabled === false) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6">
+        <div className="max-w-md text-center space-y-3">
+          <div className="text-4xl">⛔</div>
+          <h1 className="text-2xl font-semibold text-zinc-100">Event unavailable</h1>
+          <p className="text-zinc-500 text-sm">This event has been disabled by the host.</p>
+          <Button asChild className="mt-2">
+            <Link href="/">Go back home</Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   const { data: attendees } = await supabase
     .from('attendees')
     .select('id, full_name, payment_confirmed')

@@ -33,6 +33,7 @@ const createEventSchema = z.object({
   spotify_url: z.string().nullable().optional(),
   max_spots: z.coerce.number().min(0).nullable().optional(),
   password: z.string().nullable().optional(),
+  enabled: z.boolean().default(true),
 })
 
 const registerAttendeeSchema = z.object({
@@ -60,6 +61,7 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
   const paymentLink = formData.get('payment_link') as string
   const currency = formData.get('currency') as string
   const imageFile = formData.get('image') as File | null
+  const enabledValue = formData.get('enabled')
   
   let imageUrl: string | null = null
   
@@ -88,6 +90,7 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
   
   const spotifyUrl = formData.get('spotify_url') as string
   const maxSpotsValue = formData.get('max_spots')
+  const enabledValueUpdate = formData.get('enabled')
   
   // Collect payment methods
   const bankAccount = {
@@ -145,6 +148,7 @@ export async function createEvent(prevState: ActionState, formData: FormData): P
     spotify_url: spotifyUrl || null,
     max_spots: maxSpotsValue ? Number(maxSpotsValue) : null,
     password: passwordValue?.trim() || null,
+    enabled: enabledValue === 'false' ? false : true,
   }
 
   const parsed = createEventSchema.safeParse(rawData)
@@ -363,6 +367,7 @@ export async function updateEvent(prevState: ActionState, formData: FormData): P
   
   const spotifyUrl = formData.get('spotify_url') as string
   const maxSpotsValue = formData.get('max_spots')
+  const enabledValueUpdate = formData.get('enabled')
   
   // Collect payment methods
   const bankAccountUpdate = {
@@ -418,6 +423,7 @@ export async function updateEvent(prevState: ActionState, formData: FormData): P
     spotify_url: spotifyUrl || null,
     max_spots: maxSpotsValue ? Number(maxSpotsValue) : null,
     password: passwordValueUpdate?.trim() || null,
+    enabled: enabledValueUpdate === 'false' ? false : true,
   }
 
   const parsed = createEventSchema.safeParse(rawData)

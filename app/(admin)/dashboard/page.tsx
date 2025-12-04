@@ -118,6 +118,11 @@ export default async function DashboardPage() {
                         Private
                       </Badge>
                     )}
+                    {event.enabled === false && (
+                      <Badge variant="secondary" className="text-xs bg-red-500/10 text-red-400 border-red-500/20">
+                        Disabled
+                      </Badge>
+                    )}
                   </div>
 
                   {/* Location */}

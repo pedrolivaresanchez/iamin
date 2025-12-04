@@ -63,6 +63,7 @@ type Event = {
   spotify_url: string | null
   max_spots: number | null
   password: string | null
+  enabled: boolean | null
 }
 
 export default function EditEventDialog({ event }: { event: Event }) {
@@ -73,6 +74,7 @@ export default function EditEventDialog({ event }: { event: Event }) {
   const [isPending, startTransition] = useTransition()
   const [imagePreview, setImagePreview] = useState<string | null>(event.image_url)
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethods>(event.payment_methods || {})
+  const [enabled, setEnabled] = useState<boolean>(event.enabled ?? true)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,6 +146,7 @@ export default function EditEventDialog({ event }: { event: Event }) {
         <form onSubmit={handleSubmit} className="p-4">
           <input type="hidden" name="event_id" value={event.id} />
           <input type="hidden" name="existing_image_url" value={imagePreview === event.image_url ? (event.image_url || '') : ''} />
+          <input type="hidden" name="enabled" value={enabled ? 'true' : 'false'} />
           <PaymentMethodsInputs methods={paymentMethods} />
           
           {error && (
@@ -302,6 +305,24 @@ export default function EditEventDialog({ event }: { event: Event }) {
                 className="h-11 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl"
                 placeholder="Leave empty for public"
               />
+            </div>
+
+            <div className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2.5">
+              <div>
+                <p className="text-sm text-zinc-200">Event Status</p>
+                <p className="text-xs text-zinc-500">Disable to hide the event from guests</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEnabled(!enabled)}
+                className={`px-3 h-9 rounded-lg text-xs font-medium border transition-colors ${
+                  enabled
+                    ? 'bg-emerald-600 text-white border-emerald-500'
+                    : 'bg-zinc-800 text-zinc-300 border-zinc-700'
+                }`}
+              >
+                {enabled ? 'Enabled' : 'Disabled'}
+              </button>
             </div>
           </div>
 

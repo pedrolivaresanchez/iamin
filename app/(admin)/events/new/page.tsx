@@ -54,6 +54,7 @@ type EventData = {
   password: string
   spotifyUrl: string
   paymentMethods: PaymentMethods
+  enabled: boolean
 }
 
 function SubmitButton() {
@@ -194,6 +195,7 @@ export default function NewEventPage() {
     password: '',
     spotifyUrl: '',
     paymentMethods: {},
+  enabled: true,
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -285,6 +287,7 @@ export default function NewEventPage() {
               <input type="hidden" name="max_spots" value={eventData.maxSpots} />
               <input type="hidden" name="password" value={eventData.password} />
               <input type="hidden" name="spotify_url" value={eventData.spotifyUrl} />
+              <input type="hidden" name="enabled" value={eventData.enabled ? 'true' : 'false'} />
               <PaymentMethodsInputs methods={eventData.paymentMethods} />
 
               {/* Step 1: Basics */}

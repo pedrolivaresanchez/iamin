@@ -85,6 +85,7 @@ export default async function EventDetailPage({
             spotify_url: event.spotify_url,
             max_spots: event.max_spots,
             password: event.password,
+            enabled: event.enabled,
           }} />
         </div>
       </div>
