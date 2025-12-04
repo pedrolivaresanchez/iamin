@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { getCurrencySymbol, getCurrencyFlag } from '@/lib/currencies'
 import PaymentPopup from './payment-popup'
 import SpotifyEmbed from './spotify-embed'
+import PasswordGate from './password-gate'
 import type { Metadata } from 'next'
 
 export async function generateMetadata({
@@ -107,7 +108,7 @@ export default async function EventPage({
   const spotsLeft = hasMaxSpots ? event.max_spots - totalAttendees : null
   const isFull = hasMaxSpots && spotsLeft !== null && spotsLeft <= 0
 
-  return (
+  const eventContent = (
     <div className="min-h-screen bg-zinc-950 relative overflow-hidden">
       <AnimatedBackground />
 
@@ -311,4 +312,15 @@ export default async function EventPage({
       </div>
     </div>
   )
+
+  // Wrap with password gate if event has a password
+  if (event.password) {
+    return (
+      <PasswordGate eventTitle={event.title} eventPassword={event.password}>
+        {eventContent}
+      </PasswordGate>
+    )
+  }
+
+  return eventContent
 }

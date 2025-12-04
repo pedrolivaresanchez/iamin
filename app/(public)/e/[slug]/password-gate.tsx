@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -11,13 +11,16 @@ type Props = {
 }
 
 export default function PasswordGate({ eventTitle, eventPassword, children }: Props) {
-  const [isUnlocked, setIsUnlocked] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem(`event-unlocked-${eventPassword}`)
-      return stored === 'true'
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem(`event-unlocked-${eventPassword}`)
+    if (stored === 'true') {
+      setIsUnlocked(true)
     }
-    return false
-  })
+    setIsLoading(false)
+  }, [eventPassword])
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
@@ -30,6 +33,14 @@ export default function PasswordGate({ eventTitle, eventPassword, children }: Pr
       setError('Incorrect password')
       setPassword('')
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-zinc-700 border-t-zinc-400 rounded-full animate-spin" />
+      </div>
+    )
   }
 
   if (isUnlocked) {
