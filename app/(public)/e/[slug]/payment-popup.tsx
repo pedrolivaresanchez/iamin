@@ -139,15 +139,15 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
       )}
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setOpen(false)}
           />
           
-          {/* Modal */}
-          <div className="relative bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-sm shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+          {/* Modal - full width on mobile, max-w-md on desktop */}
+          <div className="relative bg-zinc-900 border-t sm:border border-zinc-800 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl animate-in slide-in-from-bottom sm:fade-in sm:zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -230,7 +230,10 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
                   
                   const PaymentIcon = () => (
                     config.logo ? (
-                      <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-white p-1.5">
+                      <div 
+                        className="w-12 h-12 rounded-xl overflow-hidden shrink-0 p-2 flex items-center justify-center"
+                        style={{ backgroundColor: method === 'bizum' ? '#05C3C3' : '#ffffff' }}
+                      >
                         <img src={config.logo} alt={config.label} className="w-full h-full object-contain" />
                       </div>
                     ) : (
