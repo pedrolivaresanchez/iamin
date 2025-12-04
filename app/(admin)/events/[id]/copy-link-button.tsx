@@ -24,7 +24,7 @@ export default function CopyLinkButton({ slug }: { slug: string }) {
         document.body.removeChild(textArea)
       }
       setCopied(true)
-      toast.success('Link copied!')
+      toast.success('Link copied to clipboard!')
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
       console.error('Failed to copy:', err)
@@ -34,10 +34,15 @@ export default function CopyLinkButton({ slug }: { slug: string }) {
 
   return (
     <Button
+      type="button"
       onClick={copyToClipboard}
       variant="outline"
       size="sm"
-      className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+      className={`min-w-[110px] border-zinc-700 transition-all ${
+        copied 
+          ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
+          : 'text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'
+      }`}
     >
       {copied ? '✓ Copied!' : '🔗 Copy Link'}
     </Button>

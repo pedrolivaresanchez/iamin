@@ -398,11 +398,7 @@ export default function NewEventPage() {
                   {/* Date & Time */}
                   <div className="space-y-2">
                     <Label className="text-zinc-300">Date & Time *</Label>
-                    <DateTimePicker 
-                      name="date" 
-                      value={eventData.date || undefined}
-                      onChange={(date) => updateField('date', date || null)}
-                    />
+                    <DateTimePicker name="date" />
                   </div>
 
                   {/* Location */}

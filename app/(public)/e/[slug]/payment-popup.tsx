@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 type PaymentMethods = {
   revolut?: string
@@ -18,13 +19,13 @@ type PaymentMethods = {
 }
 
 const PAYMENT_CONFIG = {
-  revolut: { label: 'Revolut', color: '#0075EB', abbr: 'RE' },
-  paypal: { label: 'PayPal', color: '#003087', abbr: 'PP' },
-  venmo: { label: 'Venmo', color: '#3D95CE', abbr: 'VE' },
-  bizum: { label: 'Bizum', color: '#00C3B3', abbr: 'BI' },
-  cashapp: { label: 'Cash App', color: '#00D632', abbr: 'CA' },
-  other: { label: 'Other', color: '#525252', abbr: '🔗' },
-  bank_account: { label: 'Bank Transfer', color: '#1a365d', abbr: '🏦' },
+  revolut: { label: 'Revolut', color: '#0075EB', abbr: 'RE', logo: 'https://assets.revolut.com/assets/brand/Revolut-Symbol-Black.svg' },
+  paypal: { label: 'PayPal', color: '#003087', abbr: 'PP', logo: 'https://www.paypalobjects.com/webstatic/icon/pp258.png' },
+  venmo: { label: 'Venmo', color: '#008CFF', abbr: 'V', logo: '/folder/venmo.svg' },
+  bizum: { label: 'Bizum', color: '#05C3C3', abbr: 'B', logo: '/folder/bizum.png' },
+  cashapp: { label: 'Cash App', color: '#00D632', abbr: '$', logo: null },
+  other: { label: 'Other', color: '#525252', abbr: '🔗', logo: null },
+  bank_account: { label: 'Bank Transfer', color: '#1a365d', abbr: '🏦', logo: null },
 }
 
 function getPaymentUrl(method: string, tag: string, price: number, currency: string, note?: string): string | null {
@@ -191,7 +192,10 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
                             <div className="flex items-center gap-2">
                               <span className="text-zinc-200 font-mono text-xs">{bank.iban}</span>
                               <button
-                                onClick={() => navigator.clipboard.writeText(bank.iban || '')}
+                                onClick={() => {
+                                  navigator.clipboard.writeText(bank.iban || '')
+                                  toast.success('IBAN copied!')
+                                }}
                                 className="px-2 py-1 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded text-xs transition-colors"
                               >
                                 Copy
@@ -214,18 +218,28 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
                   const config = PAYMENT_CONFIG[method as keyof typeof PAYMENT_CONFIG]
                   const url = getPaymentUrl(method, tag, price, currency, eventTitle)
                   
+                  const PaymentIcon = () => (
+                    config.logo ? (
+                      <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-white p-1.5">
+                        <img src={config.logo} alt={config.label} className="w-full h-full object-contain" />
+                      </div>
+                    ) : (
+                      <div 
+                        className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0"
+                        style={{ backgroundColor: config.color }}
+                      >
+                        {config.abbr}
+                      </div>
+                    )
+                  )
+
                   if (method === 'bizum') {
                     return (
                       <div
                         key={method}
                         className="flex items-center gap-4 p-4 rounded-xl bg-zinc-800/50 border border-zinc-700/50"
                       >
-                        <div 
-                          className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0"
-                          style={{ backgroundColor: config.color }}
-                        >
-                          {config.abbr}
-                        </div>
+                        <PaymentIcon />
                         <div className="flex-1">
                           <p className="text-zinc-200 font-medium">{config.label}</p>
                           <p className="text-zinc-400 text-sm">Send to: {tag}</p>
@@ -233,6 +247,7 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
                         <button
                           onClick={() => {
                             navigator.clipboard.writeText(tag)
+                            toast.success('Phone number copied!')
                           }}
                           className="px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 text-zinc-200 rounded-lg text-sm transition-colors"
                         >
@@ -250,12 +265,7 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
                       rel="noopener noreferrer"
                       className="flex items-center gap-4 p-4 rounded-xl bg-zinc-800/50 border border-zinc-700/50 hover:bg-zinc-800 hover:border-zinc-600 transition-colors group"
                     >
-                      <div 
-                        className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-sm font-bold shrink-0"
-                        style={{ backgroundColor: config.color }}
-                      >
-                        {config.abbr}
-                      </div>
+                      <PaymentIcon />
                       <div className="flex-1">
                         <p className="text-zinc-200 font-medium">{config.label}</p>
                         <p className="text-zinc-500 text-sm">@{tag.replace('@', '').replace('$', '')}</p>

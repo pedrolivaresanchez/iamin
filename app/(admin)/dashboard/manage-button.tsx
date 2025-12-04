@@ -16,10 +16,11 @@ export default function ManageButton({ eventId }: { eventId: string }) {
 
   return (
     <Button
+      type="button"
       onClick={handleClick}
       disabled={isLoading}
       size="sm"
-      className="flex-1"
+      className="flex-1 bg-zinc-100 text-zinc-900 hover:bg-white"
     >
       {isLoading ? (
         <>
