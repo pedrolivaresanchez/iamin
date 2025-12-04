@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 
 type PaymentMethods = {
@@ -64,6 +65,11 @@ type Props = {
 
 export default function PaymentPopup({ methods, price, currency, currencySymbol, eventTitle, isOpen, onClose }: Props) {
   const [internalOpen, setInternalOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   // Support both controlled (isOpen/onClose) and uncontrolled mode
   const open = isOpen !== undefined ? isOpen : internalOpen
@@ -138,7 +144,7 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
         </button>
       )}
 
-      {open && (
+      {open && mounted && createPortal(
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
           {/* Backdrop */}
           <div 
@@ -296,7 +302,8 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
               </p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )
