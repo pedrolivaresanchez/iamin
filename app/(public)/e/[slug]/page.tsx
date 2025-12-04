@@ -8,7 +8,6 @@ import AttendeesWall from './attendees-wall'
 import AnimatedBackground from './animated-background'
 import { Button } from '@/components/ui/button'
 import { getCurrencySymbol, getCurrencyFlag } from '@/lib/currencies'
-import PaymentPopup from './payment-popup'
 import SpotifyEmbed from './spotify-embed'
 import PasswordGate from './password-gate'
 import type { Metadata } from 'next'
@@ -237,27 +236,19 @@ export default async function EventPage({
               </div>
             )}
 
-            {/* Payment Section */}
+            {/* Payment Section - Price only, payment methods shown after registration */}
             {hasPrice && (
-              <div className="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-900/30">
-                <p className="text-xs text-emerald-500/70 uppercase tracking-wide font-medium mb-2">Event Price</p>
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{getCurrencyFlag(event.currency)}</span>
-                    <p className="font-bold text-emerald-400 text-2xl">
-                      {getCurrencySymbol(event.currency)}{Number(event.price).toFixed(2)}
-                    </p>
-                    <span className="text-sm text-emerald-500/70">{event.currency || 'USD'}</span>
-                  </div>
-                  {event.payment_methods && (
-                    <PaymentPopup 
-                      methods={event.payment_methods}
-                      price={Number(event.price)}
-                      currency={event.currency || 'USD'}
-                      currencySymbol={getCurrencySymbol(event.currency)}
-                      eventTitle={event.title}
-                    />
-                  )}
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-zinc-200 font-medium">
+                    {getCurrencySymbol(event.currency)}{Number(event.price).toFixed(2)} <span className="text-zinc-500 font-normal">{event.currency || 'USD'}</span>
+                  </p>
+                  <p className="text-zinc-500 text-sm mt-0.5">Entry fee</p>
                 </div>
               </div>
             )}
@@ -279,13 +270,21 @@ export default async function EventPage({
                 <>
                   <h2 className="text-xl font-semibold text-zinc-100 mb-1">Join this event</h2>
                   <p className="text-sm text-zinc-500 mb-6">Fill in your details to register</p>
-                  <RegistrationForm event={{
+                  <RegistrationForm 
+                    event={{
                       id: event.id,
                       title: event.title,
                       description: event.description,
                       date: event.date,
                       location: event.location,
-                    }} />
+                    }}
+                    payment={hasPrice ? {
+                      price: Number(event.price),
+                      currency: event.currency || 'USD',
+                      currencySymbol: getCurrencySymbol(event.currency),
+                      methods: event.payment_methods,
+                    } : undefined}
+                  />
                 </>
               )}
             </div>
@@ -318,7 +317,14 @@ export default async function EventPage({
                 id: a.id,
                 full_name: a.full_name,
                 payment_confirmed: a.payment_confirmed
-              })) || []} 
+              })) || []}
+              payment={hasPrice && event.payment_methods ? {
+                price: Number(event.price),
+                currency: event.currency || 'USD',
+                currencySymbol: getCurrencySymbol(event.currency),
+                methods: event.payment_methods,
+                eventTitle: event.title,
+              } : undefined}
             />
           </div>
         </div>

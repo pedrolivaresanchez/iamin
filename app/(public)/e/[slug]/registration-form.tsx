@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { CountryCodePicker } from '@/components/ui/country-code-picker'
 import { generateGoogleCalendarUrl, downloadIcsFile, addHoursToDate } from '@/lib/calendar'
+import PaymentPopup from './payment-popup'
 import confetti from 'canvas-confetti'
 
 type EventDetails = {
@@ -18,6 +19,13 @@ type EventDetails = {
   description?: string | null
   date: string
   location?: string | null
+}
+
+type PaymentDetails = {
+  price: number
+  currency: string
+  currencySymbol: string
+  methods?: Record<string, unknown>
 }
 
 function SubmitButton() {
@@ -40,7 +48,7 @@ function SubmitButton() {
   )
 }
 
-export default function RegistrationForm({ event }: { event: EventDetails }) {
+export default function RegistrationForm({ event, payment }: { event: EventDetails; payment?: PaymentDetails }) {
   const [state, formAction] = useActionState<ActionState, FormData>(registerAttendee, {})
   const formRef = useRef<HTMLFormElement>(null)
   const hasTriggeredConfetti = useRef(false)
@@ -108,6 +116,26 @@ export default function RegistrationForm({ event }: { event: EventDetails }) {
         <h3 className="font-bold text-2xl text-zinc-100">You&apos;re on the list!</h3>
         <p className="text-zinc-400 mt-2 mb-6">Can&apos;t wait to see you there</p>
         
+        {/* Payment Section - shown only after registration */}
+        {payment && payment.methods && (
+          <div className="mb-6 p-4 rounded-2xl bg-emerald-950/20 border border-emerald-900/30">
+            <p className="text-xs text-emerald-500/70 uppercase tracking-wide font-medium mb-3">Complete Your Payment</p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <p className="font-bold text-emerald-400 text-2xl">
+                {payment.currencySymbol}{payment.price.toFixed(2)}
+              </p>
+              <span className="text-sm text-emerald-500/70">{payment.currency}</span>
+            </div>
+            <PaymentPopup 
+              methods={payment.methods as Parameters<typeof PaymentPopup>[0]['methods']}
+              price={payment.price}
+              currency={payment.currency}
+              currencySymbol={payment.currencySymbol}
+              eventTitle={event.title}
+            />
+          </div>
+        )}
+
         <div className="space-y-2">
           <p className="text-zinc-500 text-sm mb-3">Add to your calendar</p>
           <div className="flex gap-2 justify-center">

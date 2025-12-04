@@ -4,11 +4,20 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import ShareButton from './share-button'
 import Link from 'next/link'
+import PaymentPopup from './payment-popup'
 
 type Attendee = {
   id: string
   full_name: string
   payment_confirmed: boolean
+}
+
+type PaymentInfo = {
+  price: number
+  currency: string
+  currencySymbol: string
+  methods: Record<string, unknown>
+  eventTitle: string
 }
 
 const FUN_EMOJIS = [
@@ -140,12 +149,15 @@ function getWittyPhrase(id: string, index: number): string {
 export default function AttendeesWall({ 
   eventId, 
   initialAttendees,
+  payment,
 }: { 
   eventId: string
   initialAttendees: Attendee[]
+  payment?: PaymentInfo
 }) {
   const [attendees, setAttendees] = useState(initialAttendees)
   const [emojiMap, setEmojiMap] = useState<Record<string, string>>({})
+  const [showPaymentFor, setShowPaymentFor] = useState<string | null>(null)
 
   useEffect(() => {
     const initialEmojis: Record<string, string> = {}
@@ -253,9 +265,16 @@ export default function AttendeesWall({
                 <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
                   Paid ✓
                 </span>
+              ) : payment?.methods ? (
+                <button
+                  onClick={() => setShowPaymentFor(attendee.id)}
+                  className="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium hover:bg-amber-500/20 transition-colors cursor-pointer"
+                >
+                  Pay →
+                </button>
               ) : (
-                <span className="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-medium">
-                  Not Paid
+                <span className="text-xs px-2.5 py-1 rounded-full bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 font-medium">
+                  Pending
                 </span>
               )}
             </div>
@@ -280,6 +299,19 @@ export default function AttendeesWall({
           Create Your Own Event →
         </Link>
       </div>
+
+      {/* Payment Popup - rendered in portal to escape container */}
+      {showPaymentFor && payment?.methods && (
+        <PaymentPopup 
+          methods={payment.methods as Parameters<typeof PaymentPopup>[0]['methods']}
+          price={payment.price}
+          currency={payment.currency}
+          currencySymbol={payment.currencySymbol}
+          eventTitle={payment.eventTitle}
+          isOpen={true}
+          onClose={() => setShowPaymentFor(null)}
+        />
+      )}
     </div>
   )
 }

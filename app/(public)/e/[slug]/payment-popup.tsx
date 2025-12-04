@@ -58,10 +58,16 @@ type Props = {
   currency: string
   currencySymbol: string
   eventTitle?: string
+  isOpen?: boolean
+  onClose?: () => void
 }
 
-export default function PaymentPopup({ methods, price, currency, currencySymbol, eventTitle }: Props) {
-  const [open, setOpen] = useState(false)
+export default function PaymentPopup({ methods, price, currency, currencySymbol, eventTitle, isOpen, onClose }: Props) {
+  const [internalOpen, setInternalOpen] = useState(false)
+  
+  // Support both controlled (isOpen/onClose) and uncontrolled mode
+  const open = isOpen !== undefined ? isOpen : internalOpen
+  const setOpen = onClose !== undefined ? (v: boolean) => !v && onClose() : setInternalOpen
   
   const activeMethodsCount = Object.entries(methods).filter(([k, v]) => {
     if (k === 'bank_account') {
@@ -73,8 +79,11 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
   
   if (activeMethodsCount === 0) return null
 
-  // If only one payment method, just show direct link
-  if (activeMethodsCount === 1) {
+  // Controlled mode - just show popup
+  const isControlled = isOpen !== undefined
+
+  // If only one payment method and NOT in controlled mode, show direct link
+  if (!isControlled && activeMethodsCount === 1) {
     const entry = Object.entries(methods).find(([k, v]) => {
       if (k === 'bank_account') {
         const bank = v as PaymentMethods['bank_account']
@@ -85,7 +94,6 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
     const [method, tag] = entry
     
     if (method === 'bank_account') {
-      const bank = tag as PaymentMethods['bank_account']
       return (
         <button 
           onClick={() => setOpen(true)}
@@ -121,12 +129,14 @@ export default function PaymentPopup({ methods, price, currency, currencySymbol,
 
   return (
     <>
-      <button 
-        onClick={() => setOpen(true)}
-        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-medium transition-all hover:scale-105 shadow-lg shadow-emerald-900/30"
-      >
-        Pay Now →
-      </button>
+      {!isControlled && (
+        <button 
+          onClick={() => setOpen(true)}
+          className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-medium transition-all hover:scale-105 shadow-lg shadow-emerald-900/30"
+        >
+          Pay Now →
+        </button>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
