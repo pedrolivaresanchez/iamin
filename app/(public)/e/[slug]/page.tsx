@@ -33,18 +33,31 @@ export async function generateMetadata({
     }
   }
 
+  const description = event.description 
+    ? event.description.slice(0, 160) 
+    : `Join ${event.title} - RSVP now on iamin`
+
   return {
-    title: event.title,
-    description: event.description || `Join ${event.title}`,
+    title: `${event.title} | iamin`,
+    description,
     openGraph: {
+      type: 'website',
       title: event.title,
-      description: event.description || `Join ${event.title}`,
-      images: event.image_url ? [{ url: event.image_url, width: 1200, height: 630 }] : [],
+      description,
+      siteName: 'iamin',
+      images: event.image_url ? [
+        {
+          url: event.image_url,
+          width: 1200,
+          height: 630,
+          alt: event.title,
+        }
+      ] : [],
     },
     twitter: {
       card: 'summary_large_image',
       title: event.title,
-      description: event.description || `Join ${event.title}`,
+      description,
       images: event.image_url ? [event.image_url] : [],
     },
   }
