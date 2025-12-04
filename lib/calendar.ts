@@ -2,30 +2,15 @@ export type CalendarEvent = {
   title: string
   description?: string
   location?: string
-  startDate: Date
-  endDate: Date
+  startDate: string // ISO date string like "2025-12-04T16:00:00"
+  endDate: string
 }
 
-// Format date as local time for Google Calendar (YYYYMMDDTHHmmss)
-function formatDateForGoogle(date: Date): string {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  const seconds = String(date.getSeconds()).padStart(2, '0')
-  return `${year}${month}${day}T${hours}${minutes}${seconds}`
-}
-
-// Format date for ICS file (local time without Z suffix)
-function formatDateForIcs(date: Date): string {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  const seconds = String(date.getSeconds()).padStart(2, '0')
-  return `${year}${month}${day}T${hours}${minutes}${seconds}`
+// Parse ISO date string directly without timezone conversion
+// Input: "2025-12-04T16:00:00" -> Output: "20251204T160000"
+function formatDateDirect(dateString: string): string {
+  // Remove dashes, colons, and everything after seconds
+  return dateString.replace(/[-:]/g, '').slice(0, 15)
 }
 
 export function generateGoogleCalendarUrl(event: CalendarEvent): string {
