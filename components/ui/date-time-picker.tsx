@@ -20,102 +20,82 @@ import {
 } from '@/components/ui/select'
 
 interface DateTimePickerProps {
-  value?: Date
-  onChange?: (date: Date | undefined) => void
   name?: string
   defaultValue?: string
 }
 
-// Generate hours array (00-23)
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
-// Generate minutes array (00, 15, 30, 45)
 const MINUTES = ['00', '15', '30', '45']
 
-export function DateTimePicker({ value, onChange, name, defaultValue }: DateTimePickerProps) {
-  const [date, setDate] = React.useState<Date | undefined>(() => {
-    if (value) return value
-    if (defaultValue) return new Date(defaultValue)
-    return undefined
+export function DateTimePicker({ name, defaultValue }: DateTimePickerProps) {
+  // Parse defaultValue: "2025-12-04T16:00:00" -> dateStr="2025-12-04", hour="16", minute="00"
+  const [dateStr, setDateStr] = React.useState(() => {
+    if (defaultValue) {
+      const match = defaultValue.match(/^(\d{4}-\d{2}-\d{2})/)
+      return match ? match[1] : ''
+    }
+    return ''
   })
   
   const [hour, setHour] = React.useState(() => {
-    if (value) return format(value, 'HH')
-    if (defaultValue) return format(new Date(defaultValue), 'HH')
+    if (defaultValue) {
+      const match = defaultValue.match(/T(\d{2}):/)
+      return match ? match[1] : '19'
+    }
     return '19'
   })
   
   const [minute, setMinute] = React.useState(() => {
-    if (value) return format(value, 'mm')
     if (defaultValue) {
-      const m = format(new Date(defaultValue), 'mm')
-      // Round to nearest 15
-      const num = parseInt(m)
-      if (num < 8) return '00'
-      if (num < 23) return '15'
-      if (num < 38) return '30'
-      if (num < 53) return '45'
-      return '00'
+      const match = defaultValue.match(/T\d{2}:(\d{2})/)
+      if (match) {
+        const num = parseInt(match[1])
+        if (num < 8) return '00'
+        if (num < 23) return '15'
+        if (num < 38) return '30'
+        if (num < 53) return '45'
+        return '00'
+      }
     }
     return '00'
   })
 
-  const updateDateTime = (newDate?: Date, newHour?: string, newMinute?: string) => {
-    const d = newDate ?? date
-    const h = newHour ?? hour
-    const m = newMinute ?? minute
-    
-    if (d) {
-      const updated = new Date(d)
-      updated.setHours(parseInt(h), parseInt(m))
-      setDate(updated)
-      onChange?.(updated)
+  // For calendar display only
+  const displayDate = dateStr ? new Date(dateStr + 'T12:00:00') : undefined
+
+  const handleDateSelect = (selected: Date | undefined) => {
+    if (selected) {
+      const y = selected.getFullYear()
+      const m = String(selected.getMonth() + 1).padStart(2, '0')
+      const d = String(selected.getDate()).padStart(2, '0')
+      setDateStr(`${y}-${m}-${d}`)
     }
   }
 
-  const handleDateSelect = (selectedDate: Date | undefined) => {
-    if (selectedDate) {
-      setDate(selectedDate)
-      updateDateTime(selectedDate)
-    }
-  }
-
-  const handleHourChange = (newHour: string) => {
-    setHour(newHour)
-    updateDateTime(undefined, newHour)
-  }
-
-  const handleMinuteChange = (newMinute: string) => {
-    setMinute(newMinute)
-    updateDateTime(undefined, undefined, newMinute)
-  }
-
-  // Format the date for the hidden input (local ISO format without timezone conversion)
-  const formattedValue = date ? 
-    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:00` 
-    : ''
+  // Build final value directly from strings
+  const formattedValue = dateStr ? `${dateStr}T${hour}:${minute}:00` : ''
 
   return (
     <div className="flex gap-2">
       {name && <input type="hidden" name={name} value={formattedValue} />}
       
-      {/* Date Picker */}
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             className={cn(
               'flex-1 h-11 justify-start text-left font-normal bg-zinc-800 border-zinc-700 text-zinc-100 hover:bg-zinc-700 hover:text-zinc-100 rounded-xl',
-              !date && 'text-zinc-500'
+              !dateStr && 'text-zinc-500'
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4 text-zinc-500" />
-            {date ? format(date, 'MMMM do, yyyy') : <span>Pick a date</span>}
+            {displayDate ? format(displayDate, 'MMMM do, yyyy') : <span>Pick a date</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0 bg-zinc-900 border-zinc-700" align="start">
           <Calendar
             mode="single"
-            selected={date}
+            selected={displayDate}
             onSelect={handleDateSelect}
             initialFocus
             className="bg-zinc-900 text-zinc-100"
@@ -123,7 +103,6 @@ export function DateTimePicker({ value, onChange, name, defaultValue }: DateTime
         </PopoverContent>
       </Popover>
 
-      {/* Time Picker */}
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -138,7 +117,7 @@ export function DateTimePicker({ value, onChange, name, defaultValue }: DateTime
           <div className="flex items-center gap-2">
             <div className="flex flex-col items-center">
               <span className="text-xs text-zinc-500 mb-1">Hour</span>
-              <Select value={hour} onValueChange={handleHourChange}>
+              <Select value={hour} onValueChange={setHour}>
                 <SelectTrigger className="w-20 h-10 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-lg">
                   <SelectValue />
                 </SelectTrigger>
@@ -154,7 +133,7 @@ export function DateTimePicker({ value, onChange, name, defaultValue }: DateTime
             <span className="text-zinc-500 text-xl font-light mt-5">:</span>
             <div className="flex flex-col items-center">
               <span className="text-xs text-zinc-500 mb-1">Min</span>
-              <Select value={minute} onValueChange={handleMinuteChange}>
+              <Select value={minute} onValueChange={setMinute}>
                 <SelectTrigger className="w-20 h-10 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-lg">
                   <SelectValue />
                 </SelectTrigger>

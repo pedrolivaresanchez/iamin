@@ -10,21 +10,30 @@ import { Badge } from '@/components/ui/badge'
 import { getCurrencySymbol, getCurrencyFlag } from '@/lib/currencies'
 
 function formatEventDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
+  const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (match) {
+    const [, year, month, day] = match
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
+  }
+  return dateString
 }
 
 function formatEventTime(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  const match = dateString.match(/T(\d{2}):(\d{2})/)
+  if (match) {
+    const hour = parseInt(match[1])
+    const minute = match[2]
+    const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
+    const ampm = hour < 12 ? 'AM' : 'PM'
+    return `${String(h12).padStart(2, '0')}:${minute} ${ampm}`
+  }
+  return dateString
 }
 
 export default async function EventDetailPage({

@@ -50,21 +50,31 @@ export async function generateMetadata({
 }
 
 function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-  })
+  // Parse directly to avoid timezone conversion: "2025-12-04T16:00:00"
+  const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (match) {
+    const [, year, month, day] = match
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric',
+    })
+  }
+  return dateString
 }
 
 function formatTime(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  }).toLowerCase()
+  // Parse directly to avoid timezone conversion: "2025-12-04T16:00:00"
+  const match = dateString.match(/T(\d{2}):(\d{2})/)
+  if (match) {
+    const hour = parseInt(match[1])
+    const minute = match[2]
+    const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
+    const ampm = hour < 12 ? 'am' : 'pm'
+    return `${h12}:${minute} ${ampm}`
+  }
+  return dateString
 }
 
 export default async function EventPage({

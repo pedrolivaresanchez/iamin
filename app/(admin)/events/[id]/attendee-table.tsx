@@ -53,10 +53,13 @@ type Attendee = {
 }
 
 function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  const day = date.getDate()
-  const month = date.toLocaleString('en-US', { month: 'short' })
-  return `${month} ${day}`
+  const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (match) {
+    const [, year, month, day] = match
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+  return dateString
 }
 
 export default function AttendeeTable({ attendees, eventId }: { attendees: Attendee[]; eventId: string }) {

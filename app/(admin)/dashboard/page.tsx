@@ -9,11 +9,16 @@ import CreateEventButton from './create-event-button'
 import DeleteEventButton from './delete-event-button'
 
 function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  })
+  const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (match) {
+    const [, year, month, day] = match
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    })
+  }
+  return dateString
 }
 
 export default async function DashboardPage() {
@@ -59,7 +64,11 @@ export default async function DashboardPage() {
         <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
           {events.map((event) => {
             const attendeeCount = countMap[event.id] || 0
-            const isPast = new Date(event.date) < new Date()
+            const match = event.date.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/)
+            const eventDate = match 
+              ? new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]), parseInt(match[4]), parseInt(match[5]))
+              : new Date(event.date)
+            const isPast = eventDate < new Date()
             
             return (
               <div 
