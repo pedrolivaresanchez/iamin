@@ -273,10 +273,10 @@ export default function HomePage() {
                   </div>
 
                   <div className="space-y-3">
-                     <PaymentRow name="Revolut" amount="$450.00" color="text-blue-400" bg="bg-blue-400/10" letter="R" />
-                     <PaymentRow name="PayPal" amount="$320.00" color="text-indigo-400" bg="bg-indigo-400/10" letter="P" />
-                     <PaymentRow name="Venmo" amount="$280.00" color="text-sky-400" bg="bg-sky-400/10" letter="V" />
-                     <PaymentRow name="Cash" amount="$200.00" color="text-emerald-400" bg="bg-emerald-400/10" letter="$" />
+                     <PaymentRow name="Revolut" amount="$450.00" bg="bg-zinc-800" logo="https://cdn.simpleicons.org/revolut/white" />
+                     <PaymentRow name="PayPal" amount="$320.00" bg="bg-[#00457C]" logo="https://cdn.simpleicons.org/paypal/white" />
+                     <PaymentRow name="Venmo" amount="$280.00" bg="bg-[#008CFF]" logo="https://cdn.simpleicons.org/venmo/white" />
+                     <PaymentRow name="Cash" amount="$200.00" bg="bg-emerald-600" letter="$" />
                   </div>
                </div>
             </div>
@@ -435,12 +435,16 @@ function MockAttendeeRow({ emoji, name, status, subtitle, delay, compact }: { em
   )
 }
 
-function PaymentRow({ name, amount, color, bg, letter }: { name: string, amount: string, color: string, bg: string, letter: string }) {
+function PaymentRow({ name, amount, bg, logo, letter }: { name: string, amount: string, bg: string, logo?: string, letter?: string }) {
   return (
     <div className="flex items-center justify-between p-4 rounded-2xl bg-zinc-950/50 border border-white/5 hover:bg-zinc-900 transition-colors group">
       <div className="flex items-center gap-4">
-         <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center ${color} font-bold text-sm shadow-sm group-hover:scale-110 transition-transform`}>
-           {letter}
+         <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
+           {logo ? (
+             <img src={logo} alt={name} className="w-5 h-5" />
+           ) : (
+             <span className="text-white font-bold text-sm">{letter}</span>
+           )}
          </div>
          <span className="font-medium text-zinc-200">{name}</span>
       </div>
