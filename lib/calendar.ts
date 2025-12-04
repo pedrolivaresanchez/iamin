@@ -9,15 +9,27 @@ export type CalendarEvent = {
 // Parse ISO date string directly without timezone conversion
 // Input: "2025-12-04T16:00:00" -> Output: "20251204T160000"
 function formatDateDirect(dateString: string): string {
-  // Remove dashes, colons, and everything after seconds
   return dateString.replace(/[-:]/g, '').slice(0, 15)
+}
+
+// Format current timestamp for ICS DTSTAMP (needs to be UTC)
+function formatNowForIcs(): string {
+  const now = new Date()
+  return now.toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z'
+}
+
+// Add hours to an ISO date string
+export function addHoursToDate(dateString: string, hours: number): string {
+  const date = new Date(dateString)
+  date.setHours(date.getHours() + hours)
+  return date.toISOString().slice(0, 19)
 }
 
 export function generateGoogleCalendarUrl(event: CalendarEvent): string {
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: event.title,
-    dates: `${formatDateForGoogle(event.startDate)}/${formatDateForGoogle(event.endDate)}`,
+    dates: `${formatDateDirect(event.startDate)}/${formatDateDirect(event.endDate)}`,
     details: event.description || '',
     location: event.location || '',
   })
@@ -36,9 +48,9 @@ export function generateIcsFile(event: CalendarEvent): string {
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
     `UID:${uid}`,
-    `DTSTAMP:${formatDateForIcs(new Date())}`,
-    `DTSTART:${formatDateForIcs(event.startDate)}`,
-    `DTEND:${formatDateForIcs(event.endDate)}`,
+    `DTSTAMP:${formatNowForIcs()}`,
+    `DTSTART:${formatDateDirect(event.startDate)}`,
+    `DTEND:${formatDateDirect(event.endDate)}`,
     `SUMMARY:${event.title.replace(/[,;\\]/g, '\\$&')}`,
     `DESCRIPTION:${(event.description || '').replace(/[,;\\]/g, '\\$&').replace(/\n/g, '\\n')}`,
     `LOCATION:${(event.location || '').replace(/[,;\\]/g, '\\$&')}`,
@@ -61,4 +73,3 @@ export function downloadIcsFile(event: CalendarEvent): void {
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
 }
-

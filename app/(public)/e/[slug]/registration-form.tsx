@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { CountryCodePicker } from '@/components/ui/country-code-picker'
-import { generateGoogleCalendarUrl, downloadIcsFile } from '@/lib/calendar'
+import { generateGoogleCalendarUrl, downloadIcsFile, addHoursToDate } from '@/lib/calendar'
 import confetti from 'canvas-confetti'
 
 type EventDetails = {
@@ -81,27 +81,23 @@ export default function RegistrationForm({ event }: { event: EventDetails }) {
   }, [state.success, router])
 
   const handleAddToGoogleCalendar = () => {
-    const startDate = new Date(event.date)
-    const endDate = new Date(startDate.getTime() + 3 * 60 * 60 * 1000) // 3 hours default
     const url = generateGoogleCalendarUrl({
       title: event.title,
       description: event.description || undefined,
       location: event.location || undefined,
-      startDate,
-      endDate,
+      startDate: event.date,
+      endDate: addHoursToDate(event.date, 3),
     })
     window.open(url, '_blank')
   }
 
   const handleDownloadIcs = () => {
-    const startDate = new Date(event.date)
-    const endDate = new Date(startDate.getTime() + 3 * 60 * 60 * 1000) // 3 hours default
     downloadIcsFile({
       title: event.title,
       description: event.description || undefined,
       location: event.location || undefined,
-      startDate,
-      endDate,
+      startDate: event.date,
+      endDate: addHoursToDate(event.date, 3),
     })
   }
 
