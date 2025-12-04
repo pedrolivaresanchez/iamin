@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Check, Calendar, CreditCard, Globe, Lock, Music, Smartphone, Layout, MessageSquare, Share2, Zap, ShieldCheck, ArrowRight, Sparkles, Users } from 'lucide-react'
+import { Check, Calendar, Globe, Lock, Music, MessageSquare, Share2, Zap, ArrowRight, Sparkles, Users } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -13,11 +13,6 @@ export default function HomePage() {
             <span className="text-xl">🎉</span>
             <span className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-white to-zinc-400">iamin</span>
           </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-            <Link href="#features" className="hover:text-white transition-colors">Features</Link>
-            <Link href="#how-it-works" className="hover:text-white transition-colors">How it works</Link>
-            <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
-          </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors hidden sm:block">
               Log in
@@ -46,6 +41,30 @@ export default function HomePage() {
             <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full animate-twinkle" />
             <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-twinkle delay-1000" />
             <div className="absolute bottom-1/3 left-1/3 w-1 h-1 bg-blue-400 rounded-full animate-twinkle delay-2000" />
+
+            {/* Floating emojis - desktop only */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none hidden md:block">
+              <span className="absolute top-[8%] left-[5%] text-5xl opacity-50 animate-blob">🎉</span>
+              <span className="absolute top-[12%] right-[8%] text-4xl opacity-45 animate-blob animation-delay-2000">✨</span>
+              <span className="absolute bottom-[10%] left-[10%] text-5xl opacity-50 animate-blob animation-delay-4000">🎊</span>
+              <span className="absolute bottom-[20%] right-[5%] text-4xl opacity-45 animate-blob animation-delay-6000">🥳</span>
+              <span className="absolute top-[35%] left-[3%] text-3xl opacity-40 animate-blob animation-delay-2000">🎈</span>
+              <span className="absolute top-[25%] left-[18%] text-3xl opacity-35 animate-blob animation-delay-4000">🍾</span>
+              <span className="absolute bottom-[35%] right-[12%] text-3xl opacity-40 animate-blob">🪩</span>
+              <span className="absolute top-[60%] right-[18%] text-3xl opacity-35 animate-blob animation-delay-6000">🎶</span>
+              <span className="absolute bottom-[50%] left-[22%] text-2xl opacity-30 animate-blob animation-delay-2000">💫</span>
+              <span className="absolute top-[5%] right-[22%] text-3xl opacity-40 animate-blob animation-delay-4000">🌟</span>
+              <span className="absolute top-[18%] left-[35%] text-3xl opacity-45 animate-blob animation-delay-6000">🎁</span>
+              <span className="absolute bottom-[5%] right-[28%] text-3xl opacity-40 animate-blob">🎀</span>
+              <span className="absolute top-[45%] right-[3%] text-4xl opacity-45 animate-blob animation-delay-2000">🍸</span>
+              <span className="absolute bottom-[65%] left-[3%] text-3xl opacity-35 animate-blob animation-delay-4000">🎤</span>
+              <span className="absolute top-[75%] left-[25%] text-3xl opacity-40 animate-blob animation-delay-6000">🕺</span>
+              <span className="absolute top-[3%] left-[12%] text-3xl opacity-35 animate-blob">💃</span>
+              <span className="absolute bottom-[3%] left-[32%] text-3xl opacity-45 animate-blob animation-delay-2000">🎵</span>
+              <span className="absolute top-[50%] right-[25%] text-3xl opacity-30 animate-blob animation-delay-4000">🥂</span>
+              <span className="absolute bottom-[28%] left-[2%] text-3xl opacity-40 animate-blob animation-delay-6000">🎧</span>
+              <span className="absolute top-[22%] left-[2%] text-3xl opacity-35 animate-blob">🌈</span>
+            </div>
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto text-center">
@@ -84,27 +103,37 @@ export default function HomePage() {
 
             {/* Social Proof / Logos */}
             <div className="mt-20 sm:mt-24 animate-fade-in-up delay-500 border-t border-white/5 pt-10 max-w-3xl mx-auto">
-              <p className="text-sm font-medium text-zinc-500 mb-8 uppercase tracking-widest">Trusted by modern hosts & integrated with</p>
-              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-                {/* Spotify */}
-                <svg className="h-8 w-auto" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.48.66.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141 4.38-1.38 9.781-.719 13.44 1.56.54.3.66.84.301 1.261zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-                </svg>
+              <p className="text-sm font-medium text-zinc-500 mb-8 uppercase tracking-widest">Integrated with</p>
+              <div className="flex flex-wrap justify-center items-center gap-x-10 gap-y-6">
+                {/* Spotify - Official Logo */}
+                <div className="flex items-center gap-2.5 opacity-70 hover:opacity-100 transition-opacity">
+                  <img src="https://cdn.simpleicons.org/spotify/1DB954" alt="Spotify" className="h-8 w-8" />
+                  <span className="text-[#1DB954] font-semibold text-lg">Spotify</span>
+                </div>
                 
-                {/* PayPal */}
-                <svg className="h-8 w-auto" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.946 5.05-4.336 6.795-9.077 6.795h-2.13c-.527 0-.96.384-1.039.9l-1.638 7.112a.639.639 0 0 0 .624.737h2.974c.525 0 .963-.385 1.042-.901l.127-.528c.13-.563.624-.961 1.201-.961h1.28c3.603 0 6.197-1.787 6.975-6.258.07-.405.123-.809.154-1.209.528-.485 1.004-1.093 1.334-1.875.502-1.192.519-2.607.073-3.952-.732-2.206-2.985-3.344-6.57-3.344H7.972a.641.641 0 0 0-.632.738l3.726 23.465a.64.64 0 0 0 .633.74h4.623"/>
-                </svg>
-
-                {/* Revolut (Simple Text/Logo Representation for now as complex path) */}
-                <div className="h-6 flex items-center">
-                   <span className="font-black text-2xl tracking-tighter">Revolut</span>
+                {/* PayPal - Official Logo */}
+                <div className="flex items-center gap-2.5 opacity-70 hover:opacity-100 transition-opacity">
+                  <img src="https://cdn.simpleicons.org/paypal/00457C" alt="PayPal" className="h-7 w-7" />
+                  <span className="text-[#00457C] font-semibold text-lg">PayPal</span>
                 </div>
 
-                {/* Venmo (V shape) */}
-                <svg className="h-8 w-auto" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.45 4.06c.37-1.62.88-2.65 2.4-3.04-1.9-.88-4.26 1.27-4.8 3.5L13.3 17.9l-4.46-13.2c-.26-.78-.9-2.92-3.04-3.55 1.87-.53 3.56.85 4.05 2.2l3.4 12.32L19.45 4.06z"/>
-                </svg>
+                {/* Revolut - Official Logo */}
+                <div className="flex items-center gap-2.5 opacity-70 hover:opacity-100 transition-opacity">
+                  <img src="https://cdn.simpleicons.org/revolut/white" alt="Revolut" className="h-7 w-7" />
+                  <span className="text-white font-semibold text-lg">Revolut</span>
+                </div>
+
+                {/* Venmo - Official Logo */}
+                <div className="flex items-center gap-2.5 opacity-70 hover:opacity-100 transition-opacity">
+                  <img src="https://cdn.simpleicons.org/venmo/008CFF" alt="Venmo" className="h-7 w-7" />
+                  <span className="text-[#008CFF] font-semibold text-lg">Venmo</span>
+                </div>
+
+                {/* Google Calendar - Official Logo */}
+                <div className="flex items-center gap-2.5 opacity-70 hover:opacity-100 transition-opacity">
+                  <img src="https://cdn.simpleicons.org/googlecalendar" alt="Google Calendar" className="h-7 w-7" />
+                  <span className="text-white font-semibold text-lg">Calendar</span>
+                </div>
               </div>
             </div>
           </div>
@@ -113,64 +142,65 @@ export default function HomePage() {
         {/* Feature 1: Seamless across devices */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-32 pt-10">
           <div className="text-center mb-16">
-            <span className="text-emerald-400 font-medium tracking-wide uppercase text-xs mb-2 block">Seamless across devices</span>
-            <h2 className="text-3xl sm:text-5xl font-bold mb-4">Mobile first,<br/> desktop ready</h2>
-            <p className="text-zinc-400 text-lg">Your event page looks stunning on every screen size.</p>
+            <span className="text-emerald-400 font-medium tracking-wide uppercase text-xs mb-2 block">Works everywhere</span>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-4">One link.<br/> Every device.</h2>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">Share a single link that works beautifully on phones, tablets, and desktops. Your guests just tap and RSVP.</p>
           </div>
           
-          <div className="bg-[#0F0F0F] border border-white/5 rounded-[2.5rem] p-8 sm:p-12 overflow-hidden relative group">
-            {/* Glow Effect on Hover */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-[3rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-              <div className="space-y-10 order-2 lg:order-1">
-                 <div className="flex gap-5 items-start">
-                   <div className="w-12 h-12 rounded-2xl bg-zinc-800/50 border border-white/5 flex items-center justify-center shrink-0 text-white shadow-inner">
-                     <Smartphone className="w-6 h-6" />
-                   </div>
-                   <div>
-                     <h3 className="text-xl font-bold mb-2 text-white">Mobile Web App</h3>
-                     <p className="text-zinc-400 leading-relaxed">Guests can RSVP, pay, and check details from their phone. No app download needed. Works instantly.</p>
-                   </div>
-                 </div>
-                 <div className="flex gap-5 items-start">
-                   <div className="w-12 h-12 rounded-2xl bg-zinc-800/50 border border-white/5 flex items-center justify-center shrink-0 text-white shadow-inner">
-                     <Layout className="w-6 h-6" />
-                   </div>
-                   <div>
-                     <h3 className="text-xl font-bold mb-2 text-white">Desktop Dashboard</h3>
-                     <p className="text-zinc-400 leading-relaxed">Manage your events, track analytics, and edit details from a powerful desktop view.</p>
-                   </div>
-                 </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Mobile Card */}
+            <div className="bg-[#0F0F0F] border border-white/5 rounded-[2rem] p-8 relative overflow-hidden group hover:border-emerald-500/30 transition-all duration-500">
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-colors duration-500" />
+              
+              <div className="relative z-10">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-3xl">📱</span>
+                </div>
+                <h3 className="text-2xl font-bold mb-3 text-white">For Your Guests</h3>
+                <p className="text-zinc-400 leading-relaxed mb-6">Instant access from any phone. No app downloads, no sign-ups. Just tap the link and RSVP in seconds.</p>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="text-emerald-400">✓</span>
+                    <span className="text-zinc-300">One-tap RSVP</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="text-emerald-400">✓</span>
+                    <span className="text-zinc-300">Pay via Revolut, PayPal, Venmo</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="text-emerald-400">✓</span>
+                    <span className="text-zinc-300">Add to calendar instantly</span>
+                  </div>
+                </div>
               </div>
+            </div>
 
-              {/* Interactive Preview Area */}
-              <div className="order-1 lg:order-2 flex justify-center lg:justify-end relative perspective-[1000px]">
-                 <div className="relative z-10 transform transition-transform duration-700 lg:group-hover:rotate-y-[-5deg] lg:group-hover:rotate-x-[5deg]">
-                   {/* Mobile Mockup */}
-                   <div className="w-[260px] h-[520px] bg-black border-[6px] border-zinc-800 rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-white/10 relative">
-                      {/* Dynamic Island */}
-                      <div className="absolute top-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-20" />
-                      
-                      <div className="h-full bg-black overflow-y-auto pt-12 px-5 pb-6 scrollbar-hide">
-                        <div className="w-full h-32 bg-zinc-900 rounded-2xl mb-4 overflow-hidden relative group/card">
-                           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 transition-transform duration-500 group-hover/card:scale-110" />
-                        </div>
-                        <h3 className="font-bold text-white text-xl mb-1">Summer Party 🌴</h3>
-                        <div className="flex gap-2 mb-6">
-                          <Badge variant="secondary" className="h-6 bg-zinc-800 text-zinc-300 border-zinc-700 px-2">Aug 24</Badge>
-                          <Badge variant="secondary" className="h-6 bg-zinc-800 text-zinc-300 border-zinc-700 px-2">7:00 PM</Badge>
-                        </div>
-                        <Button size="sm" className="w-full h-10 text-sm rounded-xl mb-6 bg-white text-black font-semibold hover:bg-zinc-200">I'm In!</Button>
-                        <div className="space-y-3">
-                           <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider">Who's going</p>
-                           <MockAttendeeRow emoji="😎" name="You" status="paid" compact delay={0} />
-                           <MockAttendeeRow emoji="💃" name="Sarah" status="paid" compact delay={100} />
-                           <MockAttendeeRow emoji="🎸" name="Mike" status="unpaid" compact delay={200} />
-                        </div>
-                      </div>
-                   </div>
-                 </div>
+            {/* Desktop Card */}
+            <div className="bg-[#0F0F0F] border border-white/5 rounded-[2rem] p-8 relative overflow-hidden group hover:border-blue-500/30 transition-all duration-500">
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors duration-500" />
+              
+              <div className="relative z-10">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-3xl">💻</span>
+                </div>
+                <h3 className="text-2xl font-bold mb-3 text-white">For You (The Host)</h3>
+                <p className="text-zinc-400 leading-relaxed mb-6">Powerful dashboard to manage everything. Track RSVPs, see who paid, and edit your event anytime.</p>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="text-blue-400">✓</span>
+                    <span className="text-zinc-300">Real-time guest list</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="text-blue-400">✓</span>
+                    <span className="text-zinc-300">Payment tracking</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="text-blue-400">✓</span>
+                    <span className="text-zinc-300">Edit event details anytime</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -186,7 +216,6 @@ export default function HomePage() {
               
               <div className="space-y-6 mt-8">
                 <FeatureListItem title="Real-time RSVPs" desc="Watch your guest list grow live as people register." />
-                <FeatureListItem title="Instant Notifications" desc="Get notified the moment someone joins or pays." />
                 <FeatureListItem title="Smart Sharing" desc="One link for everything. Share on WhatsApp, Insta, or text." />
                 <FeatureListItem title="Export Data" desc="Download your guest list to CSV anytime." />
               </div>
@@ -273,30 +302,9 @@ export default function HomePage() {
                    <h4 className="font-bold text-white mb-2 text-lg">Payment Tracking</h4>
                    <p className="text-sm text-zinc-400 leading-relaxed">Mark payments as verified manually or let attendees self-report.</p>
                  </div>
-                 <div>
-                   <h4 className="font-bold text-white mb-2 text-lg">Invoicing</h4>
-                   <p className="text-sm text-zinc-400 leading-relaxed">Automatic simple receipts sent to your guests upon registration.</p>
-                 </div>
               </div>
             </div>
           </div>
-        </section>
-
-        {/* Features Grid */}
-        <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-32">
-           <div className="text-center mb-20">
-             <span className="text-zinc-500 font-medium tracking-wide uppercase text-xs mb-2 block">Features</span>
-             <h2 className="text-3xl sm:text-5xl font-bold mb-4">Built for hosts,<br/> powered by simplicity</h2>
-           </div>
-           
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <GridFeature title="Smart Notifications" desc="Get notified on RSVPs." icon={<MessageSquare className="w-5 h-5" />} />
-              <GridFeature title="Spotify Integration" desc="Collaborative playlists." icon={<Music className="w-5 h-5" />} />
-              <GridFeature title="Calendar Sync" desc="Auto-generated .ics files." icon={<Calendar className="w-5 h-5" />} />
-              <GridFeature title="Private Events" desc="Password protection." icon={<Lock className="w-5 h-5" />} />
-              <GridFeature title="Global Currency" desc="Accept any currency." icon={<Globe className="w-5 h-5" />} />
-              <GridFeature title="Custom Themes" desc="Beautiful auto-design." icon={<Zap className="w-5 h-5" />} />
-           </div>
         </section>
 
         {/* Reviews (Mock) */}
@@ -317,42 +325,6 @@ export default function HomePage() {
                </div>
              </div>
            </div>
-        </section>
-
-        {/* Pricing */}
-        <section id="pricing" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-32">
-          <div className="text-center mb-20">
-            <span className="text-zinc-500 font-medium tracking-wide uppercase text-xs mb-2 block">Pricing</span>
-            <h2 className="text-3xl sm:text-5xl font-bold mb-4">Simple plans <br/> for serious fun</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-             <PricingCard 
-               title="Basic" 
-               price="Free" 
-               desc="For casual get-togethers."
-               features={["Unlimited events", "Unlimited guests", "Basic themes", "All payment methods"]}
-               buttonText="Start Free"
-               highlighted={false}
-             />
-             <PricingCard 
-               title="Pro" 
-               price="$19" 
-               period="/year"
-               desc="For regular hosts."
-               features={["Everything in Basic", "Remove branding", "Priority support", "Custom domain (soon)"]}
-               buttonText="Go Pro"
-               highlighted={true}
-             />
-             <PricingCard 
-               title="Enterprise" 
-               price="Custom" 
-               desc="For large organizations."
-               features={["Everything in Pro", "Custom contracts", "SLA", "Dedicated support"]}
-               buttonText="Contact Sales"
-               highlighted={false}
-             />
-          </div>
         </section>
 
         {/* CTA */}
@@ -376,13 +348,13 @@ export default function HomePage() {
         {/* Footer */}
         <footer className="border-t border-white/5 pt-20 pb-12 bg-[#050505]">
            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-             <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-20">
-               <div className="col-span-2 md:col-span-1">
+             <div className="flex flex-col md:flex-row justify-between gap-12 mb-20">
+               <div className="max-w-sm">
                  <Link href="/" className="font-bold text-xl flex items-center gap-2 mb-6">
                    <span className="text-2xl">🎉</span>
                    <span className="text-white">iamin</span>
                  </Link>
-                 <p className="text-zinc-500 text-sm leading-relaxed max-w-xs">
+                 <p className="text-zinc-500 text-sm leading-relaxed">
                    Events made beautifully simple. The all-in-one platform for modern hosts.
                  </p>
                </div>
@@ -390,23 +362,8 @@ export default function HomePage() {
                  <h4 className="font-bold mb-6 text-white">Product</h4>
                  <ul className="space-y-4 text-sm text-zinc-400">
                    <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
-                   <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                    <li><Link href="/login" className="hover:text-white transition-colors">Log in</Link></li>
-                 </ul>
-               </div>
-               <div>
-                 <h4 className="font-bold mb-6 text-white">Company</h4>
-                 <ul className="space-y-4 text-sm text-zinc-400">
-                   <li><Link href="#" className="hover:text-white transition-colors">About</Link></li>
-                   <li><Link href="#" className="hover:text-white transition-colors">Blog</Link></li>
-                   <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
-                 </ul>
-               </div>
-               <div>
-                 <h4 className="font-bold mb-6 text-white">Legal</h4>
-                 <ul className="space-y-4 text-sm text-zinc-400">
-                   <li><Link href="#" className="hover:text-white transition-colors">Privacy</Link></li>
-                   <li><Link href="#" className="hover:text-white transition-colors">Terms</Link></li>
+                   <li><Link href="/signup" className="hover:text-white transition-colors">Sign up</Link></li>
                  </ul>
                </div>
              </div>
@@ -446,39 +403,6 @@ function GridFeature({ title, desc, icon }: { title: string, desc: string, icon:
       </div>
       <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
       <p className="text-zinc-400 leading-relaxed">{desc}</p>
-    </div>
-  )
-}
-
-function PricingCard({ title, price, period, desc, features, buttonText, highlighted }: { title: string, price: string, period?: string, desc: string, features: string[], buttonText: string, highlighted: boolean }) {
-  return (
-    <div className={`p-10 rounded-[2.5rem] border flex flex-col relative overflow-hidden transition-transform hover:-translate-y-2 duration-300 ${highlighted ? 'bg-white text-zinc-950 border-white ring-4 ring-white/20' : 'bg-[#0F0F0F] border-white/5 hover:border-white/10'}`}>
-      {highlighted && (
-        <div className="absolute top-6 right-8 bg-zinc-950 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-          Most Popular
-        </div>
-      )}
-      <h3 className={`text-xl font-bold mb-2 ${highlighted ? 'text-zinc-900' : 'text-white'}`}>{title}</h3>
-      <div className="flex items-baseline gap-1 mb-4">
-        <span className={`text-5xl font-bold tracking-tight ${highlighted ? 'text-zinc-900' : 'text-white'}`}>{price}</span>
-        {period && <span className={`text-sm font-medium ${highlighted ? 'text-zinc-500' : 'text-zinc-500'}`}>{period}</span>}
-      </div>
-      <p className={`text-sm mb-10 leading-relaxed ${highlighted ? 'text-zinc-600' : 'text-zinc-400'}`}>{desc}</p>
-      
-      <ul className="space-y-5 mb-10 flex-1">
-        {features.map((f, i) => (
-          <li key={i} className="flex items-center gap-3 text-sm font-medium">
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${highlighted ? 'bg-emerald-100 text-emerald-600' : 'bg-zinc-800 text-zinc-400'}`}>
-              <Check className="w-3 h-3" />
-            </div>
-            <span className={highlighted ? 'text-zinc-700' : 'text-zinc-300'}>{f}</span>
-          </li>
-        ))}
-      </ul>
-      
-      <Button className={`w-full h-14 rounded-2xl font-bold text-base transition-all ${highlighted ? 'bg-zinc-950 text-white hover:bg-zinc-800 shadow-xl' : 'bg-white text-zinc-950 hover:bg-zinc-200'}`}>
-        {buttonText}
-      </Button>
     </div>
   )
 }
