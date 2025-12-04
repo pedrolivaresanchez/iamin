@@ -10,6 +10,44 @@ import { Button } from '@/components/ui/button'
 import { getCurrencySymbol, getCurrencyFlag } from '@/lib/currencies'
 import PaymentPopup from './payment-popup'
 import SpotifyEmbed from './spotify-embed'
+import type { Metadata } from 'next'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const supabase = await createClient()
+
+  const { data: event } = await supabase
+    .from('events')
+    .select('title, description, image_url')
+    .eq('slug', slug)
+    .single()
+
+  if (!event) {
+    return {
+      title: 'Event Not Found',
+    }
+  }
+
+  return {
+    title: event.title,
+    description: event.description || `Join ${event.title}`,
+    openGraph: {
+      title: event.title,
+      description: event.description || `Join ${event.title}`,
+      images: event.image_url ? [{ url: event.image_url, width: 1200, height: 630 }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: event.title,
+      description: event.description || `Join ${event.title}`,
+      images: event.image_url ? [event.image_url] : [],
+    },
+  }
+}
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
