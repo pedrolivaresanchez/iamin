@@ -188,17 +188,22 @@ export async function registerAttendee(prevState: ActionState, formData: FormDat
   // Check if event is full
   const { data: event } = await supabase
     .from('events')
-    .select('max_spots')
+    .select('max_spots, price')
     .eq('id', eventId)
     .single()
+
+  const isPaidEvent = event?.price !== null && event?.price !== undefined && Number(event.price) > 0
 
   if (event?.max_spots) {
     const { count } = await supabase
       .from('attendees')
       .select('*', { count: 'exact', head: true })
       .eq('event_id', eventId)
+      .eq('payment_confirmed', true)
 
-    if (count !== null && count >= event.max_spots) {
+    const attendeeCount = count ?? 0
+
+    if (attendeeCount >= event.max_spots) {
       return { error: 'Sorry, this event is full' }
     }
   }
@@ -214,7 +219,9 @@ export async function registerAttendee(prevState: ActionState, formData: FormDat
     return { error: parsed.error.issues[0].message }
   }
 
-  const { error } = await supabase.from('attendees').insert(parsed.data)
+  const { error } = await supabase
+    .from('attendees')
+    .insert({ ...parsed.data, payment_confirmed: isPaidEvent ? false : true })
 
   if (error) {
     if (error.code === '23505') {

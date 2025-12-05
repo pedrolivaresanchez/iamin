@@ -9,6 +9,7 @@ export async function middleware(request: NextRequest) {
     path === '/' ||
     path === '/login' ||
     path === '/signup' ||
+    path === '/events' ||
     path.startsWith('/e/') ||
     path.startsWith('/auth/')
   ) {

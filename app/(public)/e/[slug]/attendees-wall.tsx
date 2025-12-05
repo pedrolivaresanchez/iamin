@@ -158,6 +158,9 @@ export default function AttendeesWall({
   const [attendees, setAttendees] = useState(initialAttendees)
   const [emojiMap, setEmojiMap] = useState<Record<string, string>>({})
   const [showPaymentFor, setShowPaymentFor] = useState<string | null>(null)
+  const isPaidEvent = Boolean(payment)
+  const paidCount = attendees.filter(a => a.payment_confirmed).length
+  const unpaidCount = attendees.length - paidCount
 
   useEffect(() => {
     const initialEmojis: Record<string, string> = {}
@@ -228,12 +231,16 @@ export default function AttendeesWall({
             </div>
             <div>
               <h2 className="text-lg font-semibold text-zinc-100">Who&apos;s coming</h2>
-              <p className="text-sm text-zinc-500">
-                {attendees.length > 0 
-                  ? `${attendees.length} ${attendees.length === 1 ? 'person' : 'people'} registered`
-                  : 'Be the first to join!'
-                }
-              </p>
+                {attendees.length > 0 ? (
+                  <p className="text-sm text-zinc-500">
+                    {isPaidEvent
+                      ? `${paidCount} paid${unpaidCount ? ` · ${unpaidCount} pending` : ''}`
+                      : `${attendees.length} ${attendees.length === 1 ? 'person' : 'people'} registered`
+                    }
+                  </p>
+                ) : (
+                  <p className="text-sm text-zinc-500">Be the first to join!</p>
+                )}
             </div>
           </div>
           <ShareButton />

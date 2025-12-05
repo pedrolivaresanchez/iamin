@@ -130,9 +130,11 @@ export default async function EventPage({
     .order('registered_at', { ascending: false })
 
   const hasPrice = event.price !== null && event.price !== undefined && Number(event.price) > 0
+  const confirmedAttendees = attendees?.filter(a => a.payment_confirmed).length || 0
   const totalAttendees = attendees?.length || 0
   const hasMaxSpots = event.max_spots !== null && event.max_spots !== undefined && event.max_spots > 0
-  const spotsLeft = hasMaxSpots ? event.max_spots - totalAttendees : null
+  const effectiveAttendeeCount = confirmedAttendees
+  const spotsLeft = hasMaxSpots ? event.max_spots - effectiveAttendeeCount : null
   const isFull = hasMaxSpots && spotsLeft !== null && spotsLeft <= 0
 
   const eventContent = (
@@ -246,7 +248,9 @@ export default async function EventPage({
                   <p className={`font-medium ${isFull ? 'text-red-400' : 'text-zinc-200'}`}>
                     {isFull ? 'Event Full' : `${spotsLeft} spots left`}
                   </p>
-                  <p className="text-zinc-500 text-sm mt-0.5">{totalAttendees} / {event.max_spots} registered</p>
+                  <p className="text-zinc-500 text-sm mt-0.5">
+                    {`${confirmedAttendees} / ${event.max_spots} paid`}
+                  </p>
                 </div>
               </div>
             )}
