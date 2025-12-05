@@ -18,13 +18,33 @@ export const createClient = async () => {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
-              const mergedOptions = {
-                path: '/',
-                sameSite: 'lax',
-                secure: true,
+              const resolvedSameSite: 'lax' | 'strict' | 'none' | undefined =
+                options?.sameSite === 'strict' || options?.sameSite === 'none'
+                  ? options.sameSite
+                  : 'lax'
+
+              const mergedOptions: {
+                path?: string
+                sameSite?: 'lax' | 'strict' | 'none'
+                secure?: boolean
+                maxAge?: number
+                expires?: Date
+                domain?: string
+                httpOnly?: boolean
+                partitioned?: boolean
+                priority?: 'low' | 'medium' | 'high'
+              } = {
+                path: options?.path ?? '/',
+                sameSite: resolvedSameSite,
+                secure: options?.secure ?? true,
                 maxAge: options?.maxAge ?? 60 * 60 * 24 * 30, // 30 days
-                ...options,
+                expires: options?.expires,
+                domain: options?.domain,
+                httpOnly: options?.httpOnly,
+                partitioned: options?.partitioned,
+                priority: options?.priority,
               }
+
               cookieStore.set(name, value, mergedOptions)
             });
           } catch {
