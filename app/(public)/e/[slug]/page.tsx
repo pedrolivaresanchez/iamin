@@ -133,7 +133,7 @@ export default async function EventPage({
   const confirmedAttendees = attendees?.filter(a => a.payment_confirmed).length || 0
   const totalAttendees = attendees?.length || 0
   const hasMaxSpots = event.max_spots !== null && event.max_spots !== undefined && event.max_spots > 0
-  const effectiveAttendeeCount = confirmedAttendees
+  const effectiveAttendeeCount = hasPrice ? confirmedAttendees : totalAttendees
   const spotsLeft = hasMaxSpots ? event.max_spots - effectiveAttendeeCount : null
   const isFull = hasMaxSpots && spotsLeft !== null && spotsLeft <= 0
 
@@ -249,7 +249,7 @@ export default async function EventPage({
                     {isFull ? 'Event Full' : `${spotsLeft} spots left`}
                   </p>
                   <p className="text-zinc-500 text-sm mt-0.5">
-                    {`${confirmedAttendees} / ${event.max_spots} paid`}
+                    {`${effectiveAttendeeCount} / ${event.max_spots} ${hasPrice ? 'paid' : 'registered'}`}
                   </p>
                 </div>
               </div>
