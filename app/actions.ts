@@ -1,5 +1,7 @@
 'use server'
 
+import { Resend } from 'resend'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -41,6 +43,9 @@ const registerAttendeeSchema = z.object({
   phone: z.string().min(5, 'Phone number is required'),
   event_id: z.string().uuid('Invalid event ID'),
 })
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 // Types
 export type ActionState = {
@@ -188,7 +193,7 @@ export async function registerAttendee(prevState: ActionState, formData: FormDat
   // Check if event is full
   const { data: event } = await supabase
     .from('events')
-    .select('max_spots, price')
+    .select('max_spots, price, title, slug, created_by')
     .eq('id', eventId)
     .single()
 
@@ -228,6 +233,117 @@ export async function registerAttendee(prevState: ActionState, formData: FormDat
       return { error: 'You are already registered for this event' }
     }
     return { error: error.message }
+  }
+
+  const organizerEmail = event?.created_by ? await getOrganizerEmail(event.created_by) : null
+  console.log('[EMAIL DEBUG] resend:', !!resend, 'organizerEmail:', organizerEmail, 'created_by:', event?.created_by)
+
+  if (resend && organizerEmail) {
+    const eventLink = `${getBaseUrl()}/events/${eventId}`
+    const baseUrl = getBaseUrl()
+    const personEmojis = ['😎', '🥳', '🤩', '🙌', '✨', '🔥', '💃', '🕺', '🎊', '🪩', '👑', '⭐', '🌟', '💫', '🦄', '🐙', '🦋', '🌈', '🍾', '🥂']
+    const randomEmoji = personEmojis[Math.floor(Math.random() * personEmojis.length)]
+    try {
+      const result = await resend.emails.send({
+        from: `iamin 🎉 <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
+        to: organizerEmail,
+        subject: `🎉 New attendee for ${event?.title ?? 'your event'}`,
+        html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #09090b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #09090b; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 480px; background: linear-gradient(145deg, #18181b 0%, #09090b 100%); border-radius: 24px; border: 1px solid #27272a; overflow: hidden;">
+          
+          <!-- Header -->
+          <tr>
+            <td style="padding: 32px 32px 24px; text-align: center; border-bottom: 1px solid #27272a;">
+              <div style="font-size: 32px; margin-bottom: 8px;">🎉</div>
+              <div style="font-size: 24px; font-weight: 700; color: #fafafa; letter-spacing: -0.5px;">iamin</div>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 32px;">
+              <!-- New Attendee Badge -->
+              <div style="text-align: center; margin-bottom: 24px;">
+                <span style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-size: 12px; font-weight: 600; padding: 6px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
+                  New Registration
+                </span>
+              </div>
+
+              <!-- Main Message -->
+              <h1 style="color: #fafafa; font-size: 22px; font-weight: 600; text-align: center; margin: 0 0 8px; line-height: 1.3;">
+                Someone just joined your event!
+              </h1>
+              <p style="color: #71717a; font-size: 14px; text-align: center; margin: 0 0 28px;">
+                ${event?.title ?? 'Your event'}
+              </p>
+
+              <!-- Attendee Card -->
+              <div style="background: #27272a; border-radius: 16px; padding: 20px; margin-bottom: 28px;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="48" style="vertical-align: top;">
+                      <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 20px; line-height: 48px; text-align: center; display: block; width: 100%;">${randomEmoji}</span>
+                      </div>
+                    </td>
+                    <td style="padding-left: 16px; vertical-align: middle;">
+                      <div style="color: #fafafa; font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                        ${parsed.data.full_name}
+                      </div>
+                      <div style="color: #a1a1aa; font-size: 14px;">
+                        ${parsed.data.phone}
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- CTA Button -->
+              <div style="text-align: center;">
+                <a href="${eventLink}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 32px; border-radius: 12px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
+                  View All Attendees →
+                </a>
+              </div>
+
+              <p style="color: #52525b; font-size: 13px; text-align: center; margin: 24px 0 0;">
+                Mark them as joined when they arrive at your event
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px 32px; border-top: 1px solid #27272a; text-align: center;">
+              <p style="color: #52525b; font-size: 12px; margin: 0;">
+                Powered by <a href="${baseUrl}" style="color: #71717a; text-decoration: none; font-weight: 500;">iamin</a> · Create events & track RSVPs
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+        `,
+      })
+      console.log('[EMAIL DEBUG] send result:', result)
+    } catch (emailError) {
+      console.error('Failed to send organizer email', emailError)
+    }
+  } else {
+    console.log('[EMAIL DEBUG] skipped - resend:', !!resend, 'email:', organizerEmail)
   }
 
   revalidatePath(`/e`)
@@ -274,6 +390,38 @@ export async function deleteAttendee(attendeeId: string, eventId?: string): Prom
     revalidatePath(`/events/${eventId}`)
   }
   return { success: true }
+}
+
+function getBaseUrl() {
+  const explicitUrl = process.env.NEXT_PUBLIC_SITE_URL
+  if (explicitUrl) return explicitUrl.replace(/\/$/, '')
+
+  const vercelUrl = process.env.VERCEL_URL
+  if (vercelUrl) return vercelUrl.startsWith('http') ? vercelUrl : `https://${vercelUrl}`
+
+  return 'http://localhost:3000'
+}
+
+async function getOrganizerEmail(userId: string) {
+  if (!supabaseServiceRoleKey) return null
+
+  try {
+    const supabaseAdmin = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      supabaseServiceRoleKey
+    )
+
+    const { data, error } = await supabaseAdmin.auth.admin.getUserById(userId)
+    if (error) {
+      console.error('Failed to fetch organizer email', error)
+      return null
+    }
+
+    return data?.user?.email ?? null
+  } catch (error) {
+    console.error('Service role client error', error)
+    return null
+  }
 }
 
 // Delete Event

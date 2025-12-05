@@ -236,7 +236,7 @@ export default function NewEventPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)]">
+    <div className="min-h-[calc(100vh-4rem)] overflow-x-hidden">
       {/* Progress Steps */}
       <div className="flex justify-center mb-8">
         <div className="inline-flex items-center gap-1 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-1.5">
@@ -292,7 +292,7 @@ export default function NewEventPage() {
 
               {/* Step 1: Basics */}
               <div className={step === 1 ? 'block' : 'hidden'}>
-                <div className="bg-zinc-900/50 rounded-2xl border border-zinc-800/50 p-6 space-y-6">
+                <div className="bg-zinc-900/50 rounded-2xl border border-zinc-800/50 p-4 sm:p-6 space-y-5 sm:space-y-6 overflow-hidden">
                   <div>
                     <h2 className="text-xl font-semibold text-zinc-100 mb-1">Let&apos;s start with the basics</h2>
                     <p className="text-sm text-zinc-500">What&apos;s your event about?</p>
@@ -357,8 +357,9 @@ export default function NewEventPage() {
                       id="title"
                       value={eventData.title}
                       onChange={(e) => updateField('title', e.target.value)}
-                      className="h-12 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl text-lg"
+                      className="h-12 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl text-lg truncate"
                       placeholder="Summer Beach Party 🏖️"
+                      maxLength={100}
                     />
                   </div>
 
@@ -369,9 +370,10 @@ export default function NewEventPage() {
                       id="description"
                       value={eventData.description}
                       onChange={(e) => updateField('description', e.target.value)}
-                      rows={4}
-                      className="bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl resize-none"
+                      rows={3}
+                      className="bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl resize-none max-h-32 overflow-y-auto"
                       placeholder="Tell people what to expect at your event..."
+                      maxLength={1000}
                     />
                   </div>
 
@@ -383,8 +385,9 @@ export default function NewEventPage() {
                       id="host_name"
                       value={eventData.hostName}
                       onChange={(e) => updateField('hostName', e.target.value)}
-                      className="h-11 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl"
+                      className="h-11 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl truncate"
                       placeholder="John Doe"
+                      maxLength={50}
                     />
                   </div>
                 </div>
@@ -392,7 +395,7 @@ export default function NewEventPage() {
 
               {/* Step 2: Details */}
               <div className={step === 2 ? 'block' : 'hidden'}>
-                <div className="bg-zinc-900/50 rounded-2xl border border-zinc-800/50 p-6 space-y-6">
+                <div className="bg-zinc-900/50 rounded-2xl border border-zinc-800/50 p-4 sm:p-6 space-y-5 sm:space-y-6 overflow-hidden">
                   <div>
                     <h2 className="text-xl font-semibold text-zinc-100 mb-1">When and where?</h2>
                     <p className="text-sm text-zinc-500">Set the date, time, and location</p>
@@ -405,26 +408,26 @@ export default function NewEventPage() {
                   </div>
 
                   {/* Location */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 overflow-hidden">
                     <Label htmlFor="location" className="text-zinc-300">Location</Label>
                     <LocationInput
                       name="location_search"
                       value={eventData.location}
                       onChange={(value) => updateField('location', value)}
                       placeholder="Search for a venue..."
-                      className="h-11 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl"
+                      className="h-11 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl truncate"
                     />
                   </div>
 
                   {/* Spotify */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 overflow-hidden">
                     <Label htmlFor="spotify_url" className="text-zinc-300">Spotify Playlist</Label>
                     <Input
                       type="url"
                       id="spotify_url"
                       value={eventData.spotifyUrl}
                       onChange={(e) => updateField('spotifyUrl', e.target.value)}
-                      className="h-11 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl"
+                      className="h-11 bg-zinc-800 border-zinc-700 text-zinc-100 rounded-xl truncate"
                       placeholder="https://open.spotify.com/playlist/..."
                     />
                     <p className="text-xs text-zinc-600">Share your party playlist with guests</p>
@@ -434,7 +437,7 @@ export default function NewEventPage() {
 
               {/* Step 3: Settings */}
               <div className={step === 3 ? 'block' : 'hidden'}>
-                <div className="bg-zinc-900/50 rounded-2xl border border-zinc-800/50 p-6 space-y-6">
+                <div className="bg-zinc-900/50 rounded-2xl border border-zinc-800/50 p-4 sm:p-6 space-y-5 sm:space-y-6 overflow-hidden">
                   <div>
                     <h2 className="text-xl font-semibold text-zinc-100 mb-1">Final settings</h2>
                     <p className="text-sm text-zinc-500">Pricing, capacity, and access</p>
@@ -545,8 +548,8 @@ export default function NewEventPage() {
             </form>
           </div>
 
-          {/* Preview Section */}
-          <div className="lg:col-span-2 lg:sticky lg:top-6 lg:self-start">
+          {/* Preview Section - hidden on mobile */}
+          <div className="hidden lg:block lg:col-span-2 lg:sticky lg:top-6 lg:self-start">
             <EventPreview data={eventData} />
           </div>
         </div>

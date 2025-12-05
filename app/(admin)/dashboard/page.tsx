@@ -73,25 +73,29 @@ export default async function DashboardPage() {
             return (
               <div 
                 key={event.id} 
-                className="bg-zinc-900 border border-zinc-800 rounded-xl hover:bg-zinc-800/50 transition-colors group overflow-hidden"
+                className="bg-zinc-900 border border-zinc-800 rounded-xl hover:bg-zinc-800/50 transition-colors group overflow-hidden flex flex-col"
               >
-                {/* Event Image */}
-                {event.image_url ? (
-                  <div className="relative h-32 w-full">
-                    <Image 
-                      src={event.image_url} 
-                      alt={event.title}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
-                  </div>
-                ) : (
-                  <div className="h-20 w-full bg-gradient-to-br from-zinc-800 to-zinc-900" />
-                )}
+                {/* Event Image - consistent height */}
+                <div className="relative h-36 w-full shrink-0">
+                  {event.image_url ? (
+                    <>
+                      <Image 
+                        src={event.image_url} 
+                        alt={event.title}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
+                      <span className="text-4xl opacity-30">🎉</span>
+                    </div>
+                  )}
+                </div>
 
                 {/* Content */}
-                <div className="p-4 space-y-3">
+                <div className="p-4 flex flex-col flex-1">
                   {/* Title & Actions */}
                   <div className="flex justify-between items-start gap-2">
                     <h3 className="text-zinc-100 font-semibold leading-tight line-clamp-1">
@@ -101,7 +105,7 @@ export default async function DashboardPage() {
                   </div>
 
                   {/* Badges */}
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1.5 mt-3">
                     <Badge variant="secondary" className={`text-xs ${isPast ? 'bg-zinc-800 text-zinc-500' : 'bg-violet-500/10 text-violet-400 border-violet-500/20'}`}>
                       {formatDate(event.date)}
                     </Badge>
@@ -125,13 +129,15 @@ export default async function DashboardPage() {
                     )}
                   </div>
 
-                  {/* Location */}
-                  {event.location && (
-                    <p className="text-xs text-zinc-500 line-clamp-1">{event.location}</p>
-                  )}
+                  {/* Location - fixed height area */}
+                  <div className="h-5 mt-2">
+                    {event.location && (
+                      <p className="text-xs text-zinc-500 line-clamp-1">{event.location}</p>
+                    )}
+                  </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-2 border-t border-zinc-800">
+                  {/* Actions - pushed to bottom */}
+                  <div className="flex gap-2 pt-3 mt-auto border-t border-zinc-800">
                     <ManageButton eventId={event.id} />
                     <CopyLinkButton slug={event.slug} />
                   </div>
