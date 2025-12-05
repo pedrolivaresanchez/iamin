@@ -61,8 +61,11 @@ export default async function EventDetailPage({
     .order('registered_at', { ascending: false })
 
   const totalRegistered = attendees?.length || 0
-  const paidCount = attendees?.filter(a => a.payment_confirmed).length || 0
-  const unpaidCount = totalRegistered - paidCount
+  const isPaidEvent = Boolean(event.price && Number(event.price) > 0)
+  const paidCount = isPaidEvent
+    ? attendees?.filter(a => a.payment_confirmed).length || 0
+    : totalRegistered
+  const unpaidCount = isPaidEvent ? totalRegistered - paidCount : 0
 
   return (
     <div className="space-y-6">
@@ -103,7 +106,7 @@ export default async function EventDetailPage({
           <Badge variant="secondary" className="bg-zinc-800 text-zinc-300 py-1 sm:py-1.5 px-2 sm:px-3 text-xs sm:text-sm">
             🕐 {formatEventTime(event.date)}
           </Badge>
-          {event.price && Number(event.price) > 0 && (
+          {isPaidEvent && (
             <Badge variant="secondary" className="bg-emerald-950 text-emerald-400 border-emerald-900 py-1 sm:py-1.5 px-2 sm:px-3 text-xs sm:text-sm">
               {getCurrencyFlag(event.currency)} {getCurrencySymbol(event.currency)}{Number(event.price).toFixed(2)} {event.currency || 'USD'}
             </Badge>
@@ -132,24 +135,35 @@ export default async function EventDetailPage({
             <p className="text-xs text-zinc-500">Total Guests</p>
           </CardContent>
         </Card>
-        <Card className="border-zinc-800 bg-emerald-950/20 border-emerald-900/30 py-0 gap-0">
-          <CardContent className="p-3 sm:p-4">
-            <p className="text-xl sm:text-2xl font-bold text-emerald-400">{paidCount}</p>
-            <p className="text-xs text-emerald-500/70">Paid</p>
-          </CardContent>
-        </Card>
-        <Card className="border-zinc-800 bg-red-950/20 border-red-900/30 py-0 gap-0">
-          <CardContent className="p-3 sm:p-4">
-            <p className="text-xl sm:text-2xl font-bold text-red-400">{unpaidCount}</p>
-            <p className="text-xs text-red-500/70">Not Paid</p>
-          </CardContent>
-        </Card>
+        {isPaidEvent ? (
+          <>
+            <Card className="border-zinc-800 bg-emerald-950/20 border-emerald-900/30 py-0 gap-0">
+              <CardContent className="p-3 sm:p-4">
+                <p className="text-xl sm:text-2xl font-bold text-emerald-400">{paidCount}</p>
+                <p className="text-xs text-emerald-500/70">Paid</p>
+              </CardContent>
+            </Card>
+            <Card className="border-zinc-800 bg-red-950/20 border-red-900/30 py-0 gap-0">
+              <CardContent className="p-3 sm:p-4">
+                <p className="text-xl sm:text-2xl font-bold text-red-400">{unpaidCount}</p>
+                <p className="text-xs text-red-500/70">Not Paid</p>
+              </CardContent>
+            </Card>
+          </>
+        ) : (
+          <Card className="border-zinc-800 bg-emerald-950/20 border-emerald-900/30 py-0 gap-0">
+            <CardContent className="p-3 sm:p-4">
+              <p className="text-xl sm:text-2xl font-bold text-emerald-400">{totalRegistered}</p>
+              <p className="text-xs text-emerald-500/70">Confirmed</p>
+            </CardContent>
+          </Card>
+        )}
         <Card className="border-zinc-800 bg-zinc-900 py-0 gap-0">
           <CardContent className="p-3 sm:p-4">
             <p className="text-xl sm:text-2xl font-bold text-zinc-100">
               {totalRegistered > 0 ? Math.round((paidCount / totalRegistered) * 100) : 0}%
             </p>
-            <p className="text-xs text-zinc-500">Payment Rate</p>
+            <p className="text-xs text-zinc-500">{isPaidEvent ? 'Payment Rate' : 'Confirmation Rate'}</p>
           </CardContent>
         </Card>
       </div>
@@ -157,7 +171,8 @@ export default async function EventDetailPage({
       {/* Attendees Section */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Chart - Hidden on mobile, shown as small card */}
-        <Card className="border-zinc-800 bg-zinc-900 hidden sm:block h-fit">
+        {isPaidEvent && (
+          <Card className="border-zinc-800 bg-zinc-900 hidden sm:block h-fit">
           <CardHeader className="pb-1 pt-4">
             <CardTitle className="text-sm font-medium text-zinc-400">Payment Status</CardTitle>
           </CardHeader>
@@ -174,7 +189,8 @@ export default async function EventDetailPage({
               </div>
             </div>
           </CardContent>
-        </Card>
+          </Card>
+        )}
 
         {/* Attendees Table */}
         <Card className="border-zinc-800 bg-zinc-900 lg:col-span-3">
@@ -183,7 +199,7 @@ export default async function EventDetailPage({
           </CardHeader>
           <CardContent className="px-3 sm:px-6">
             {attendees && attendees.length > 0 ? (
-              <AttendeeTable attendees={attendees} eventId={event.id} />
+              <AttendeeTable attendees={attendees} eventId={event.id} isPaidEvent={isPaidEvent} />
             ) : (
               <div className="text-center py-12 sm:py-16 border border-dashed border-zinc-800 rounded-xl">
                 <span className="text-3xl sm:text-4xl mb-3 block">🎉</span>

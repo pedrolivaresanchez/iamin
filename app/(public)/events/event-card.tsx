@@ -39,7 +39,7 @@ function formatTime(dateString: string) {
   })
 }
 
-function formatPrice(price: number | null, currency?: string | null) {
+function formatPrice(price?: number | null, currency?: string | null) {
   if (price === null || price === undefined || Number(price) <= 0) return 'Free'
   const symbol = getCurrencySymbol(currency)
   return `${symbol}${Number(price).toFixed(2)}`
@@ -144,3 +144,5 @@ export function EventCard({ event, onMapClickUrl }: EventCardProps) {
     </div>
   )
 }
+
+

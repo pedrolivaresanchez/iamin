@@ -262,15 +262,16 @@ export default function AttendeesWall({
                 <p className="font-medium text-zinc-200 truncate">
                   {attendee.full_name}
                 </p>
-                {!attendee.payment_confirmed && (
+                {isPaidEvent && !attendee.payment_confirmed && (
                   <p className="text-xs text-amber-500/70 truncate">
                     {getWittyPhrase(attendee.id, index)}
                   </p>
                 )}
               </div>
-              {attendee.payment_confirmed ? (
+              {/* Status */}
+              {!isPaidEvent || attendee.payment_confirmed ? (
                 <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                  Paid ✓
+                  Confirmed ✓
                 </span>
               ) : payment?.methods ? (
                 <button

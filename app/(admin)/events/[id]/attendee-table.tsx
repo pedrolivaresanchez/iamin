@@ -62,7 +62,7 @@ function formatDate(dateString: string): string {
   return dateString
 }
 
-export default function AttendeeTable({ attendees, eventId }: { attendees: Attendee[]; eventId: string }) {
+export default function AttendeeTable({ attendees, eventId, isPaidEvent }: { attendees: Attendee[]; eventId: string; isPaidEvent: boolean }) {
   return (
     <div className="rounded-xl border border-zinc-800 overflow-hidden">
       <Table>
@@ -76,7 +76,7 @@ export default function AttendeeTable({ attendees, eventId }: { attendees: Atten
         </TableHeader>
         <TableBody>
           {attendees.map((attendee) => (
-            <AttendeeRow key={attendee.id} attendee={attendee} eventId={eventId} />
+            <AttendeeRow key={attendee.id} attendee={attendee} eventId={eventId} isPaidEvent={isPaidEvent} />
           ))}
         </TableBody>
       </Table>
@@ -84,7 +84,7 @@ export default function AttendeeTable({ attendees, eventId }: { attendees: Atten
   )
 }
 
-function AttendeeRow({ attendee, eventId }: { attendee: Attendee; eventId: string }) {
+function AttendeeRow({ attendee, eventId, isPaidEvent }: { attendee: Attendee; eventId: string; isPaidEvent: boolean }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isDeleting, startDeleteTransition] = useTransition()
@@ -140,6 +140,8 @@ function AttendeeRow({ attendee, eventId }: { attendee: Attendee; eventId: strin
     setEditDialogOpen(true)
   }
 
+  const displayConfirmed = isPaidEvent ? attendee.payment_confirmed : true
+
   return (
     <>
       <TableRow className={`border-zinc-800/50 ${isPending || isDeleting || isUpdating ? 'opacity-50' : ''}`}>
@@ -160,9 +162,9 @@ function AttendeeRow({ attendee, eventId }: { attendee: Attendee; eventId: strin
           </span>
         </TableCell>
         <TableCell>
-          {attendee.payment_confirmed ? (
+          {displayConfirmed ? (
             <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/10">
-              ✓ Paid
+              ✓ Confirmed
             </Badge>
           ) : (
             <Badge variant="secondary" className="bg-red-500/10 text-red-400 border border-red-500/20">
@@ -172,24 +174,26 @@ function AttendeeRow({ attendee, eventId }: { attendee: Attendee; eventId: strin
         </TableCell>
         <TableCell className="text-right">
           <div className="flex items-center justify-end gap-2">
-            <Button
-              onClick={handleToggle}
-              disabled={isPending || isDeleting || isUpdating}
-              size="sm"
-              className={
-                attendee.payment_confirmed
-                  ? 'bg-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700 border-0'
-                  : 'bg-emerald-600 text-white hover:bg-emerald-500 border-0'
-              }
-            >
-              {isPending ? (
-                <Spinner className="h-4 w-4" />
-              ) : attendee.payment_confirmed ? (
-                'Undo'
-              ) : (
-                '💰 Mark Paid'
-              )}
-            </Button>
+            {isPaidEvent ? (
+              <Button
+                onClick={handleToggle}
+                disabled={isPending || isDeleting || isUpdating}
+                size="sm"
+                className={
+                  attendee.payment_confirmed
+                    ? 'bg-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700 border-0'
+                    : 'bg-emerald-600 text-white hover:bg-emerald-500 border-0'
+                }
+              >
+                {isPending ? (
+                  <Spinner className="h-4 w-4" />
+                ) : attendee.payment_confirmed ? (
+                  'Undo'
+                ) : (
+                  '💰 Mark Paid'
+                )}
+              </Button>
+            ) : null}
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
