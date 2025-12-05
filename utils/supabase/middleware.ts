@@ -21,12 +21,22 @@ export const createClient = (request: NextRequest) => {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            const resolvedSameSite =
+            const resolvedSameSite: 'lax' | 'strict' | 'none' | undefined =
               options?.sameSite === 'strict' || options?.sameSite === 'none'
                 ? options.sameSite
                 : 'lax'
 
-            const mergedOptions = {
+            const mergedOptions: {
+              path?: string
+              sameSite?: 'lax' | 'strict' | 'none'
+              secure?: boolean
+              maxAge?: number
+              expires?: Date
+              domain?: string
+              httpOnly?: boolean
+              partitioned?: boolean
+              priority?: 'low' | 'medium' | 'high'
+            } = {
               path: options?.path ?? '/',
               sameSite: resolvedSameSite,
               secure: options?.secure ?? true,

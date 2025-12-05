@@ -269,9 +269,13 @@ export default function AttendeesWall({
                 )}
               </div>
               {/* Status */}
-              {!isPaidEvent || attendee.payment_confirmed ? (
+              {!isPaidEvent ? (
                 <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
                   Confirmed ✓
+                </span>
+              ) : attendee.payment_confirmed ? (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+                  Paid ✓
                 </span>
               ) : payment?.methods ? (
                 <button
