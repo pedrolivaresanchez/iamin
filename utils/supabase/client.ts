@@ -7,5 +7,20 @@ export const createClient = () =>
   createBrowserClient(
     supabaseUrl!,
     supabaseKey!,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      },
+      cookies: {
+        options: {
+          sameSite: 'lax',
+          secure: true,
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        }
+      }
+    }
   );
 
