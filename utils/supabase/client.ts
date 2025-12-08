@@ -12,14 +12,11 @@ export const createClient = () =>
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
       },
-      cookies: {
-        options: {
-          sameSite: 'lax',
-          secure: true,
-          maxAge: 60 * 60 * 24 * 30, // 30 days
-        }
+      cookieOptions: {
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        sameSite: 'lax',
+        secure: true,
       }
     }
   );
