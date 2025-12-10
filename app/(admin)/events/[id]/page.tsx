@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import AttendeeTable from './attendee-table'
+import WaitlistTable from './waitlist-table'
 import CopyLinkButton from './copy-link-button'
 import PaymentChart from './payment-chart'
 import EditEventDialog from './edit-event-dialog'
@@ -59,6 +60,12 @@ export default async function EventDetailPage({
     .select('*')
     .eq('event_id', id)
     .order('registered_at', { ascending: false })
+
+  const { data: waitlist } = await supabase
+    .from('waitlist')
+    .select('*')
+    .eq('event_id', id)
+    .order('created_at', { ascending: false })
 
   const totalRegistered = attendees?.length || 0
   const isPaidEvent = Boolean(event.price && Number(event.price) > 0)
@@ -200,6 +207,23 @@ export default async function EventDetailPage({
           )}
         </CardContent>
       </Card>
+
+      {/* Waitlist Section */}
+      {waitlist && waitlist.length > 0 && (
+        <Card className="border-zinc-800 bg-zinc-900">
+          <CardHeader className="pb-0">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base sm:text-lg text-zinc-100">Waitlist</CardTitle>
+              <Badge variant="secondary" className="bg-amber-950/30 text-amber-400 border-amber-900/30 px-2 py-0.5">
+                {waitlist.length}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="px-3 sm:px-6">
+            <WaitlistTable waitlist={waitlist} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

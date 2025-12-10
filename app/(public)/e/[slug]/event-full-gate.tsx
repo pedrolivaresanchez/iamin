@@ -1,8 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { Spinner } from '@/components/ui/spinner'
+import { Input } from '@/components/ui/input'
+import { CountryCodePicker } from '@/components/ui/country-code-picker'
+import { sendEventFullMessage } from '@/app/actions'
 import confetti from 'canvas-confetti'
 
 const funnyMessages = [
@@ -30,13 +34,17 @@ const approvalMessages = [
   "You've got skills! Keep checking back, spots may open up 🔓",
 ]
 
-export default function EventFullGate() {
+export default function EventFullGate({ eventId }: { eventId: string }) {
   const [stage, setStage] = useState<'initial' | 'pleading' | 'rejected' | 'slot-machine'>('initial')
+  const [name, setName] = useState('')
+  const [countryCode, setCountryCode] = useState('+971')
+  const [phone, setPhone] = useState('')
   const [message, setMessage] = useState('')
   const [randomMessage, setRandomMessage] = useState('')
   const [spinning, setSpinning] = useState(false)
   const [slots, setSlots] = useState(['🎉', '🎊', '🎈'])
   const [attempts, setAttempts] = useState(0)
+  const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
     setRandomMessage(funnyMessages[Math.floor(Math.random() * funnyMessages.length)])
@@ -47,12 +55,18 @@ export default function EventFullGate() {
   }
 
   const handleSubmitPlead = () => {
-    setStage('rejected')
-    setAttempts(attempts + 1)
-    if (attempts >= 2) {
-      // After 3 attempts, show slot machine
-      setTimeout(() => setStage('slot-machine'), 2000)
-    }
+    startTransition(async () => {
+      const fullPhone = `${countryCode}${phone}`
+      // Send email to organizer
+      await sendEventFullMessage(eventId, message, name, fullPhone)
+      
+      setStage('rejected')
+      setAttempts(attempts + 1)
+      if (attempts >= 2) {
+        // After 3 attempts, show slot machine
+        setTimeout(() => setStage('slot-machine'), 2000)
+      }
+    })
   }
 
   const spinSlotMachine = () => {
@@ -130,24 +144,16 @@ export default function EventFullGate() {
   if (stage === 'rejected') {
     return (
       <div className="text-center py-6 space-y-4">
-        <div className="text-4xl mb-3">🤷</div>
+        <div className="text-4xl mb-3">✅</div>
         <h2 className="text-xl font-semibold text-zinc-100">
-          {attempts >= 2 ? approvalMessages[Math.floor(Math.random() * approvalMessages.length)] : rejectionMessages[Math.floor(Math.random() * rejectionMessages.length)]}
+          You're on the Waitlist!
         </h2>
         <p className="text-sm text-zinc-400 px-4">
-          {attempts >= 2 
-            ? "Actually, wait... let's see if luck is on your side..." 
-            : "But feel free to try again! Or check back later 😉"}
+          We've notified the event organizer. They'll contact you at <span className="font-medium text-zinc-300">{countryCode}{phone}</span> if a spot opens up!
         </p>
-        {attempts < 2 && (
-          <Button
-            onClick={() => setStage('pleading')}
-            variant="outline"
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-          >
-            Try Again 🙏
-          </Button>
-        )}
+        <p className="text-xs text-zinc-600 px-4">
+          Check back later to see if spots become available.
+        </p>
       </div>
     )
   }
@@ -156,17 +162,56 @@ export default function EventFullGate() {
     return (
       <div className="py-6 space-y-4">
         <div className="text-4xl mb-3 text-center">🎤</div>
-        <h2 className="text-xl font-semibold text-zinc-100 text-center">Pitch Yourself!</h2>
+        <h2 className="text-xl font-semibold text-zinc-100 text-center">Join the Waitlist</h2>
         <p className="text-sm text-zinc-400 text-center px-4">
-          The event manager is listening... Give us your best reason why you deserve a spot!
+          The event is full, but you can join the waitlist. Tell us why you'd love to attend!
         </p>
         
-        <Textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="I bring good vibes and amazing dance moves... 💃"
-          className="min-h-32 bg-zinc-800/50 border-zinc-700/50 text-zinc-100 rounded-xl placeholder:text-zinc-600"
-        />
+        <div className="space-y-3">
+          <div>
+            <label htmlFor="name" className="text-xs text-zinc-500 mb-1.5 block">Your name</label>
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="John Doe"
+              required
+              className="h-12 bg-zinc-800/50 border-zinc-700/50 text-zinc-100 rounded-xl placeholder:text-zinc-600 focus:border-zinc-600 focus:ring-zinc-600"
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="phone" className="text-xs text-zinc-500 mb-1.5 block">Phone number</label>
+            <div className="flex gap-2">
+              <CountryCodePicker 
+                value={countryCode} 
+                onChange={setCountryCode}
+                name="country_code"
+              />
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="50 123 4567"
+                required
+                className="flex-1 h-12 bg-zinc-800/50 border-zinc-700/50 text-zinc-100 rounded-xl placeholder:text-zinc-600 focus:border-zinc-600 focus:ring-zinc-600"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label htmlFor="message" className="text-xs text-zinc-500 mb-1.5 block">Message (Optional)</label>
+            <Textarea
+              id="message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="I'd love to attend because..."
+              className="min-h-24 bg-zinc-800/50 border-zinc-700/50 text-zinc-100 rounded-xl placeholder:text-zinc-600"
+            />
+          </div>
+        </div>
         
         <div className="flex gap-2">
           <Button
@@ -178,10 +223,17 @@ export default function EventFullGate() {
           </Button>
           <Button
             onClick={handleSubmitPlead}
-            disabled={!message.trim()}
+            disabled={!name.trim() || !phone.trim() || isPending}
             className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
           >
-            Submit 🚀
+            {isPending ? (
+              <>
+                <Spinner className="mr-2" />
+                Sending...
+              </>
+            ) : (
+              'Join Waitlist'
+            )}
           </Button>
         </div>
       </div>
@@ -190,10 +242,10 @@ export default function EventFullGate() {
 
   return (
     <div className="text-center py-6 space-y-4">
-      <div className="text-4xl mb-3">🔒</div>
-      <h2 className="text-xl font-semibold text-zinc-100">{randomMessage}</h2>
+      <div className="text-4xl mb-3">📋</div>
+      <h2 className="text-xl font-semibold text-zinc-100">Event Full</h2>
       <p className="text-sm text-zinc-400 px-4">
-        All {' '}<span className="font-semibold text-zinc-300">spots are taken</span>, but you can try to convince the event manager...
+        All {' '}<span className="font-semibold text-zinc-300">spots are taken</span>, but you can join the waitlist and we'll contact you if a spot opens up.
       </p>
       
       <div className="pt-2">
@@ -201,7 +253,7 @@ export default function EventFullGate() {
           onClick={handlePlead}
           className="bg-gradient-to-br from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 text-zinc-100 font-medium border border-zinc-700/50"
         >
-          Talk to the Manager
+          Join Waitlist
         </Button>
       </div>
     </div>

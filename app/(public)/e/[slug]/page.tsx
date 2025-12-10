@@ -281,7 +281,7 @@ export default async function EventPage({
             {/* Registration Form */}
             <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-6 lg:p-8">
               {isFull ? (
-                <EventFullGate />
+                <EventFullGate eventId={event.id} />
               ) : (
                 <>
                   <h2 className="text-xl font-semibold text-zinc-100 mb-1">Join this event</h2>

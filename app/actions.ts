@@ -667,3 +667,87 @@ export async function signout(): Promise<void> {
   await supabase.auth.signOut()
   redirect('/login')
 }
+
+// Send Event Full Message to Organizer
+export async function sendEventFullMessage(eventId: string, message: string, name: string, phone: string): Promise<ActionState> {
+  try {
+    const supabase = await createClient()
+
+    // Get event details
+    const { data: event } = await supabase
+      .from('events')
+      .select('title, created_by')
+      .eq('id', eventId)
+      .single()
+
+    if (!event) {
+      return { error: 'Event not found' }
+    }
+
+    // Store waitlist entry in database
+    const { error: insertError } = await supabase
+      .from('waitlist')
+      .insert({
+        event_id: eventId,
+        full_name: name,
+        phone: phone,
+        message: message || null,
+      })
+
+    if (insertError) {
+      console.error('[WAITLIST] Error storing waitlist entry:', insertError)
+      // Continue even if storage fails - at least send the email
+    }
+
+    // Get organizer email using helper function
+    const organizerEmail = event?.created_by ? await getOrganizerEmail(event.created_by) : null
+
+    if (!organizerEmail) {
+      console.log('[WAITLIST EMAIL] No organizer email found for user:', event.created_by)
+      return { error: 'Organizer email not found' }
+    }
+
+    // Send email
+    if (resend) {
+      console.log('[WAITLIST EMAIL] Sending to:', organizerEmail)
+      await resend.emails.send({
+        from: `iamin 🎉 <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`,
+        to: organizerEmail,
+        subject: `📋 Waitlist Request: ${name} wants to join ${event.title}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #18181b;">New Waitlist Request</h2>
+            <p style="color: #52525b;">Someone wants to join your full event <strong>${event.title}</strong>:</p>
+            
+            <div style="background: #f4f4f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p style="color: #18181b; margin: 0 0 12px 0;">
+                <strong>Name:</strong> ${name}
+              </p>
+              <p style="color: #18181b; margin: 0 0 12px 0;">
+                <strong>Phone:</strong> <a href="tel:${phone}" style="color: #18181b; text-decoration: none;">${phone}</a>
+              </p>
+              ${message ? `
+                <p style="color: #18181b; margin: 12px 0 0 0;">
+                  <strong>Message:</strong>
+                </p>
+                <p style="color: #52525b; margin: 8px 0 0 0; white-space: pre-wrap;">${message}</p>
+              ` : ''}
+            </div>
+            
+            <p style="color: #52525b; font-size: 14px;">
+              You can contact them directly at <a href="tel:${phone}" style="color: #10b981;">${phone}</a> if you'd like to add them to the event.
+            </p>
+          </div>
+        `,
+      })
+      console.log('[WAITLIST EMAIL] Email sent successfully')
+    } else {
+      console.log('[WAITLIST EMAIL] Resend not configured')
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('[WAITLIST EMAIL] Error sending message:', error)
+    return { error: 'Failed to send message' }
+  }
+}
