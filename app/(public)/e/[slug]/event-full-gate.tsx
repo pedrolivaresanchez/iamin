@@ -196,19 +196,12 @@ export default function EventFullGate() {
         All {' '}<span className="font-semibold text-zinc-300">spots are taken</span>, but you can try to convince the event manager...
       </p>
       
-      <div className="flex flex-col gap-2 pt-2">
+      <div className="pt-2">
         <Button
           onClick={handlePlead}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium"
+          className="bg-gradient-to-br from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 text-zinc-100 font-medium border border-zinc-700/50"
         >
-          Talk to the Manager 🎭
-        </Button>
-        <Button
-          variant="outline"
-          className="border-zinc-700 text-zinc-400 hover:bg-zinc-800 text-xs"
-          onClick={() => window.location.reload()}
-        >
-          Check Again Later ⏰
+          Talk to the Manager
         </Button>
       </div>
     </div>
