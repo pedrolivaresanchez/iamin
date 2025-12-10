@@ -26,27 +26,27 @@ export const createClient = (request: NextRequest) => {
                 ? options.sameSite
                 : 'lax'
 
-            const mergedOptions: {
-              path?: string
-              sameSite?: 'lax' | 'strict' | 'none'
-              secure?: boolean
-              maxAge?: number
-              expires?: Date
-              domain?: string
-              httpOnly?: boolean
-              partitioned?: boolean
-              priority?: 'low' | 'medium' | 'high'
-            } = {
-              path: options?.path ?? '/',
-              sameSite: resolvedSameSite,
-              secure: options?.secure ?? true,
-              maxAge: options?.maxAge ?? 60 * 60 * 24 * 30, // keep session for 30 days
-              expires: options?.expires,
-              domain: options?.domain,
-              httpOnly: options?.httpOnly,
-              partitioned: options?.partitioned,
-              priority: options?.priority,
-            }
+              const mergedOptions: {
+                path?: string
+                sameSite?: 'lax' | 'strict' | 'none'
+                secure?: boolean
+                maxAge?: number
+                expires?: Date
+                domain?: string
+                httpOnly?: boolean
+                partitioned?: boolean
+                priority?: 'low' | 'medium' | 'high'
+              } = {
+                path: options?.path ?? '/',
+                sameSite: resolvedSameSite,
+                secure: options?.secure ?? true,
+                maxAge: options?.maxAge ?? 60 * 60 * 24 * 365, // 1 year
+                expires: options?.expires,
+                domain: options?.domain,
+                httpOnly: options?.httpOnly,
+                partitioned: options?.partitioned,
+                priority: options?.priority,
+              }
 
             request.cookies.set(name, value)
             supabaseResponse.cookies.set(name, value, mergedOptions)

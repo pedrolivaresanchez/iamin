@@ -37,7 +37,7 @@ export const createClient = async () => {
                 path: options?.path ?? '/',
                 sameSite: resolvedSameSite,
                 secure: options?.secure ?? true,
-                maxAge: options?.maxAge ?? 60 * 60 * 24 * 30, // 30 days
+                maxAge: options?.maxAge ?? 60 * 60 * 24 * 365, // 1 year
                 expires: options?.expires,
                 domain: options?.domain,
                 httpOnly: options?.httpOnly,

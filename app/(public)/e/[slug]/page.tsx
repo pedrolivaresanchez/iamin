@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import RegistrationForm from './registration-form'
 import AttendeesWall from './attendees-wall'
 import AnimatedBackground from './animated-background'
+import EventFullGate from './event-full-gate'
 import { Button } from '@/components/ui/button'
 import { getCurrencySymbol, getCurrencyFlag } from '@/lib/currencies'
 import SpotifyEmbed from './spotify-embed'
@@ -280,11 +281,7 @@ export default async function EventPage({
             {/* Registration Form */}
             <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800/50 rounded-2xl p-6 lg:p-8">
               {isFull ? (
-                <div className="text-center py-4">
-                  <div className="text-4xl mb-3">😢</div>
-                  <h2 className="text-xl font-semibold text-zinc-100 mb-1">Event Full</h2>
-                  <p className="text-sm text-zinc-500">All spots have been taken</p>
-                </div>
+                <EventFullGate />
               ) : (
                 <>
                   <h2 className="text-xl font-semibold text-zinc-100 mb-1">Join this event</h2>

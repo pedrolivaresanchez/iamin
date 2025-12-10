@@ -12,9 +12,16 @@ export const createClient = () =>
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
+        flowType: 'pkce',
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'supabase-ssr',
+        },
       },
       cookieOptions: {
-        maxAge: 60 * 60 * 24 * 30, // 30 days
+        maxAge: 60 * 60 * 24 * 365, // 1 year
         sameSite: 'lax',
         secure: true,
       }

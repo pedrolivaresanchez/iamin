@@ -1,25 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import CopyLinkButton from './copy-link-button'
-import ManageButton from './manage-button'
 import CreateEventButton from './create-event-button'
-import DeleteEventButton from './delete-event-button'
-
-function formatDate(dateString: string): string {
-  const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/)
-  if (match) {
-    const [, year, month, day] = match
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    })
-  }
-  return dateString
-}
+import DashboardEventsTable from '@/components/dashboard-events-table'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -61,91 +44,7 @@ export default async function DashboardPage() {
       </div>
 
       {events && events.length > 0 ? (
-        <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event) => {
-            const attendeeCount = countMap[event.id] || 0
-            const match = event.date.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/)
-            const eventDate = match 
-              ? new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]), parseInt(match[4]), parseInt(match[5]))
-              : new Date(event.date)
-            const isPast = eventDate < new Date()
-            
-            return (
-              <div 
-                key={event.id} 
-                className="bg-zinc-900 border border-zinc-800 rounded-xl hover:bg-zinc-800/50 transition-colors group overflow-hidden flex flex-col"
-              >
-                {/* Event Image - consistent height */}
-                <div className="relative h-36 w-full shrink-0">
-                  {event.image_url ? (
-                    <>
-                      <Image 
-                        src={event.image_url} 
-                        alt={event.title}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
-                    </>
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
-                      <span className="text-4xl opacity-30">🎉</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="p-4 flex flex-col flex-1">
-                  {/* Title & Actions */}
-                  <div className="flex justify-between items-start gap-2">
-                    <h3 className="text-zinc-100 font-semibold leading-tight line-clamp-1">
-                      {event.title}
-                    </h3>
-                    <DeleteEventButton eventId={event.id} eventTitle={event.title} />
-                  </div>
-
-                  {/* Badges */}
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    <Badge variant="secondary" className={`text-xs ${isPast ? 'bg-zinc-800 text-zinc-500' : 'bg-violet-500/10 text-violet-400 border-violet-500/20'}`}>
-                      {formatDate(event.date)}
-                    </Badge>
-                    <Badge variant="secondary" className={`text-xs ${attendeeCount > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-zinc-800 text-zinc-500'}`}>
-                      {attendeeCount} {attendeeCount === 1 ? 'guest' : 'guests'}
-                    </Badge>
-                    {isPast && (
-                      <Badge variant="secondary" className="text-xs bg-zinc-800 text-zinc-600">
-                        Past
-                      </Badge>
-                    )}
-                    {event.password && (
-                      <Badge variant="secondary" className="text-xs bg-zinc-800 text-zinc-500">
-                        Private
-                      </Badge>
-                    )}
-                    {event.enabled === false && (
-                      <Badge variant="secondary" className="text-xs bg-red-500/10 text-red-400 border-red-500/20">
-                        Disabled
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Location - fixed height area */}
-                  <div className="h-5 mt-2">
-                    {event.location && (
-                      <p className="text-xs text-zinc-500 line-clamp-1">{event.location}</p>
-                    )}
-                  </div>
-
-                  {/* Actions - pushed to bottom */}
-                  <div className="flex gap-2 pt-3 mt-auto border-t border-zinc-800">
-                    <ManageButton eventId={event.id} />
-                    <CopyLinkButton slug={event.slug} />
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+        <DashboardEventsTable events={events} attendeeCounts={countMap} />
       ) : (
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl text-center py-12 sm:py-16">
           <div className="text-4xl sm:text-5xl mb-4">🎉</div>
