@@ -81,6 +81,8 @@ export default function AttendeeTable({ attendees, eventId, isPaidEvent }: { att
   const [search, setSearch] = useState('')
   const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'unpaid'>('all')
   const [sortBy, setSortBy] = useState<'name' | 'date'>('date')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   const filteredAndSortedAttendees = useMemo(() => {
     let filtered = attendees.filter(attendee => {
@@ -110,6 +112,18 @@ export default function AttendeeTable({ attendees, eventId, isPaidEvent }: { att
 
     return filtered
   }, [attendees, search, paymentFilter, sortBy, isPaidEvent])
+
+  // Pagination
+  const totalPages = Math.ceil(filteredAndSortedAttendees.length / pageSize)
+  const paginatedAttendees = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize
+    return filteredAndSortedAttendees.slice(startIndex, startIndex + pageSize)
+  }, [filteredAndSortedAttendees, currentPage, pageSize])
+
+  // Reset to page 1 when filters change
+  useMemo(() => {
+    setCurrentPage(1)
+  }, [search, paymentFilter, sortBy])
 
   const handleExportCSV = () => {
     const csvContent = [
@@ -192,23 +206,103 @@ export default function AttendeeTable({ attendees, eventId, isPaidEvent }: { att
 
       {/* Table */}
       {filteredAndSortedAttendees.length > 0 ? (
-        <div className="rounded-xl border border-zinc-800 overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-zinc-800 bg-zinc-800/50 hover:bg-zinc-800/50">
-                <TableHead className="text-zinc-400 font-medium">Attendee</TableHead>
-                <TableHead className="text-zinc-400 font-medium">Registered</TableHead>
-                <TableHead className="text-zinc-400 font-medium">Status</TableHead>
-                <TableHead className="text-zinc-400 font-medium text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAndSortedAttendees.map((attendee) => (
-                <AttendeeRow key={attendee.id} attendee={attendee} eventId={eventId} isPaidEvent={isPaidEvent} />
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <>
+          <div className="rounded-xl border border-zinc-800 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-zinc-800 bg-zinc-800/50 hover:bg-zinc-800/50">
+                  <TableHead className="text-zinc-400 font-medium">Attendee</TableHead>
+                  <TableHead className="text-zinc-400 font-medium">Registered</TableHead>
+                  <TableHead className="text-zinc-400 font-medium">Status</TableHead>
+                  <TableHead className="text-zinc-400 font-medium text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedAttendees.map((attendee) => (
+                  <AttendeeRow key={attendee.id} attendee={attendee} eventId={eventId} isPaidEvent={isPaidEvent} />
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Pagination */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-zinc-500 text-xs">Show:</span>
+                <Select value={pageSize.toString()} onValueChange={(v) => {
+                  setPageSize(Number(v))
+                  setCurrentPage(1)
+                }}>
+                  <SelectTrigger className="w-[70px] h-8 bg-zinc-800 border-zinc-700 text-zinc-300 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-zinc-800">
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="text-xs text-zinc-500">
+                Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, filteredAndSortedAttendees.length)} of {filteredAndSortedAttendees.length}
+              </div>
+            </div>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="h-8 border-zinc-700 text-zinc-300 hover:bg-zinc-800 disabled:opacity-50"
+                >
+                  Previous
+                </Button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum: number
+                    if (totalPages <= 5) {
+                      pageNum = i + 1
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i
+                    } else {
+                      pageNum = currentPage - 2 + i
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? 'secondary' : 'ghost'}
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`h-8 w-8 p-0 ${
+                          currentPage === pageNum 
+                            ? 'bg-zinc-700 text-zinc-100' 
+                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100'
+                        }`}
+                      >
+                        {pageNum}
+                      </Button>
+                    )
+                  })}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="h-8 border-zinc-700 text-zinc-300 hover:bg-zinc-800 disabled:opacity-50"
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </div>
+        </>
       ) : (
         <div className="rounded-xl border border-zinc-800 p-12 text-center">
           <div className="text-4xl mb-3">🔍</div>
@@ -326,7 +420,7 @@ function AttendeeRow({ attendee, eventId, isPaidEvent }: { attendee: Attendee; e
                 ) : attendee.payment_confirmed ? (
                   'Undo'
                 ) : (
-                  '💰 Mark Paid'
+                  'Mark Paid'
                 )}
               </Button>
             ) : null}
